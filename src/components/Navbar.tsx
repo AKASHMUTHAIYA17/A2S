@@ -1,0 +1,119 @@
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Search, Bell, User, Menu, X, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+const navLinks = [
+  { name: 'Home', path: '/' },
+  { name: 'Movies', path: '/movies' },
+  { name: 'Categories', path: '/categories' },
+  { name: 'Subscription', path: '/subscription' },
+];
+
+export function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useState(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  });
+
+  return (
+    <nav
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        isScrolled ? 'glass py-3' : 'bg-gradient-to-b from-background/80 to-transparent py-4'
+      )}
+    >
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+            <Play className="w-5 h-5 text-primary-foreground fill-current" />
+          </div>
+          <span className="text-xl font-display font-bold text-gradient">A2S OTT</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={cn(
+                'text-sm font-medium transition-colors duration-200',
+                location.pathname === link.path
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* Right Section */}
+        <div className="hidden md:flex items-center gap-4">
+          <button className="p-2 hover:bg-secondary rounded-lg transition-colors">
+            <Search className="w-5 h-5 text-muted-foreground" />
+          </button>
+          <button className="p-2 hover:bg-secondary rounded-lg transition-colors relative">
+            <Bell className="w-5 h-5 text-muted-foreground" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+          </button>
+          <Link to="/auth">
+            <Button variant="hero" size="sm">
+              Sign In
+            </Button>
+          </Link>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden p-2 hover:bg-secondary rounded-lg transition-colors"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden glass mt-2 mx-4 rounded-xl p-4 animate-slide-up">
+          <div className="flex flex-col gap-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={cn(
+                  'px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                  location.pathname === link.path
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ))}
+            <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button variant="hero" className="w-full mt-2">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}
