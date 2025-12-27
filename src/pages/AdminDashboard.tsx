@@ -17,9 +17,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { movies, categories } from '@/data/movies';
+import { movies as initialMovies, categories } from '@/data/movies';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { Movie } from '@/types/movie';
+import EditMovieModal from '@/components/EditMovieModal';
 
 const sidebarLinks = [
   { name: 'Dashboard', icon: LayoutDashboard, active: true },
@@ -32,20 +34,41 @@ const sidebarLinks = [
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [moviesList, setMoviesList] = useState<Movie[]>(initialMovies);
+  const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { toast } = useToast();
 
   const stats = [
-    { label: 'Total Movies', value: movies.length, icon: Film, color: 'text-primary' },
+    { label: 'Total Movies', value: moviesList.length, icon: Film, color: 'text-primary' },
     { label: 'Categories', value: categories.length - 1, icon: LayoutDashboard, color: 'text-green-500' },
     { label: 'Total Users', value: '1,234', icon: Users, color: 'text-blue-500' },
     { label: 'Active Subscriptions', value: '856', icon: CreditCard, color: 'text-purple-500' },
   ];
 
-  const filteredMovies = movies.filter(movie => 
+  const filteredMovies = moviesList.filter(movie => 
     movie.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleEdit = (movie: Movie) => {
+    setEditingMovie(movie);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveMovie = (updatedMovie: Movie) => {
+    setMoviesList(prev => 
+      prev.map(m => m.id === updatedMovie.id ? updatedMovie : m)
+    );
+    setIsEditModalOpen(false);
+    setEditingMovie(null);
+    toast({
+      title: 'Movie updated',
+      description: `"${updatedMovie.title}" has been updated successfully.`,
+    });
+  };
+
   const handleDelete = (id: string) => {
+    setMoviesList(prev => prev.filter(m => m.id !== id));
     toast({
       title: 'Movie deleted',
       description: 'The movie has been removed from the catalog.',
@@ -191,12 +214,17 @@ const AdminDashboard = () => {
                       <td className="py-3 px-4 text-muted-foreground">{movie.year}</td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">
-                          <button className="p-2 rounded-lg hover:bg-secondary transition-colors">
+                          <button 
+                            onClick={() => handleEdit(movie)}
+                            className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                            title="Edit movie"
+                          >
                             <Edit className="w-4 h-4 text-muted-foreground" />
                           </button>
                           <button 
                             onClick={() => handleDelete(movie.id)}
                             className="p-2 rounded-lg hover:bg-destructive/20 transition-colors"
+                            title="Delete movie"
                           >
                             <Trash2 className="w-4 h-4 text-destructive" />
                           </button>
@@ -210,6 +238,17 @@ const AdminDashboard = () => {
           </div>
         </div>
       </main>
+
+      {/* Edit Movie Modal */}
+      <EditMovieModal
+        movie={editingMovie}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingMovie(null);
+        }}
+        onSave={handleSaveMovie}
+      />
     </div>
   );
 };
