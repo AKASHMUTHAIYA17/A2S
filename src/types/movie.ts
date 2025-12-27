@@ -4,6 +4,8 @@ export interface Movie {
   description: string;
   poster: string;
   banner?: string;
+  videoUrl?: string;
+  trailerUrl?: string;
   rating: number;
   year: number;
   duration: string;

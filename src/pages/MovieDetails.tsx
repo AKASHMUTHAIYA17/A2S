@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { MovieRow } from '@/components/MovieRow';
+import { VideoPlayer } from '@/components/VideoPlayer';
 import { movies } from '@/data/movies';
 
 const MovieDetails = () => {
   const { id } = useParams();
+  const [isPlaying, setIsPlaying] = useState(false);
   const movie = movies.find(m => m.id === id);
   const similarMovies = movies.filter(m => m.category === movie?.category && m.id !== id);
 
@@ -105,7 +108,12 @@ const MovieDetails = () => {
 
               {/* Actions */}
               <div className="flex flex-wrap items-center gap-4">
-                <Button variant="hero" size="xl" className="gap-2">
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="gap-2"
+                  onClick={() => setIsPlaying(true)}
+                >
                   <Play className="w-5 h-5 fill-current" />
                   Watch Now
                 </Button>
@@ -125,6 +133,16 @@ const MovieDetails = () => {
         </div>
       </section>
 
+      {/* Video Player Modal */}
+      {isPlaying && movie.videoUrl && (
+        <VideoPlayer
+          videoUrl={movie.videoUrl}
+          poster={movie.banner || movie.poster}
+          title={movie.title}
+          onClose={() => setIsPlaying(false)}
+          isFullScreen
+        />
+      )}
       {/* Similar Movies */}
       {similarMovies.length > 0 && (
         <MovieRow title="Similar Movies" movies={similarMovies} className="pt-12" />
