@@ -9,9 +9,11 @@ export interface Movie {
   rating: number;
   year: number;
   duration: string;
-  category: Category;
-  genres: string[];
+  category: string;
+  genres?: string[];
   featured?: boolean;
+  maturityRating?: string;
+  matchPercentage?: number;
 }
 
 export type Category = 'action' | 'drama' | 'comedy' | 'thriller' | 'horror' | 'sci-fi' | 'romance';
