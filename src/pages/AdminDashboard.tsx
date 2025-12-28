@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Film, 
@@ -13,15 +13,17 @@ import {
   Trash2,
   Play,
   Menu,
-  X
+  X,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { movies as initialMovies, categories } from '@/data/movies';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { Movie } from '@/types/movie';
+import { useAuth } from '@/hooks/useAuth';
+import { useMovies, useUpdateMovie, useDeleteMovie, useCreateMovie } from '@/hooks/useMovies';
 import EditMovieModal from '@/components/EditMovieModal';
+import AddMovieModal from '@/components/AddMovieModal';
+import { Movie } from '@/types/movie';
 
 const sidebarLinks = [
   { name: 'Dashboard', icon: LayoutDashboard, active: true },
@@ -34,19 +36,25 @@ const sidebarLinks = [
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [moviesList, setMoviesList] = useState<Movie[]>(initialMovies);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { toast } = useToast();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const { data: movies = [], isLoading } = useMovies();
+  const updateMovie = useUpdateMovie();
+  const deleteMovie = useDeleteMovie();
+  const createMovie = useCreateMovie();
 
   const stats = [
-    { label: 'Total Movies', value: moviesList.length, icon: Film, color: 'text-primary' },
-    { label: 'Categories', value: categories.length - 1, icon: LayoutDashboard, color: 'text-green-500' },
-    { label: 'Total Users', value: '1,234', icon: Users, color: 'text-blue-500' },
-    { label: 'Active Subscriptions', value: '856', icon: CreditCard, color: 'text-purple-500' },
+    { label: 'Total Movies', value: movies.length, icon: Film, color: 'text-primary' },
+    { label: 'Categories', value: 6, icon: LayoutDashboard, color: 'text-green-500' },
+    { label: 'Total Users', value: '—', icon: Users, color: 'text-blue-500' },
+    { label: 'Active Subscriptions', value: '—', icon: CreditCard, color: 'text-purple-500' },
   ];
 
-  const filteredMovies = moviesList.filter(movie => 
+  const filteredMovies = movies.filter(movie => 
     movie.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -56,23 +64,48 @@ const AdminDashboard = () => {
   };
 
   const handleSaveMovie = (updatedMovie: Movie) => {
-    setMoviesList(prev => 
-      prev.map(m => m.id === updatedMovie.id ? updatedMovie : m)
-    );
+    updateMovie.mutate({
+      id: updatedMovie.id,
+      title: updatedMovie.title,
+      description: updatedMovie.description,
+      image: updatedMovie.poster,
+      video_url: updatedMovie.videoUrl || null,
+      trailer_url: updatedMovie.trailerUrl || null,
+      category: updatedMovie.category,
+      year: updatedMovie.year,
+      rating: updatedMovie.rating,
+      duration: updatedMovie.duration,
+      maturity_rating: updatedMovie.maturityRating,
+      match_percentage: updatedMovie.matchPercentage,
+    });
     setIsEditModalOpen(false);
     setEditingMovie(null);
-    toast({
-      title: 'Movie updated',
-      description: `"${updatedMovie.title}" has been updated successfully.`,
+  };
+
+  const handleAddMovie = (movie: Omit<Movie, 'id'>) => {
+    createMovie.mutate({
+      title: movie.title,
+      description: movie.description,
+      image: movie.poster,
+      video_url: movie.videoUrl || null,
+      trailer_url: movie.trailerUrl || null,
+      category: movie.category,
+      year: movie.year,
+      rating: movie.rating,
+      duration: movie.duration,
+      maturity_rating: movie.maturityRating,
+      match_percentage: movie.matchPercentage,
     });
+    setIsAddModalOpen(false);
   };
 
   const handleDelete = (id: string) => {
-    setMoviesList(prev => prev.filter(m => m.id !== id));
-    toast({
-      title: 'Movie deleted',
-      description: 'The movie has been removed from the catalog.',
-    });
+    deleteMovie.mutate(id);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
   };
 
   return (
@@ -122,12 +155,14 @@ const AdminDashboard = () => {
 
         {/* Logout */}
         <div className="absolute bottom-4 left-4 right-4">
-          <Link to="/">
-            <Button variant="outline" className={cn('gap-2', sidebarOpen ? 'w-full' : 'w-12 justify-center')}>
-              <LogOut className="w-5 h-5" />
-              {sidebarOpen && <span>Logout</span>}
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            onClick={handleLogout}
+            className={cn('gap-2', sidebarOpen ? 'w-full' : 'w-12 justify-center')}
+          >
+            <LogOut className="w-5 h-5" />
+            {sidebarOpen && <span>Logout</span>}
+          </Button>
         </div>
       </aside>
 
@@ -136,10 +171,10 @@ const AdminDashboard = () => {
         {/* Header */}
         <header className="h-16 border-b border-border flex items-center justify-between px-6">
           <div>
-            <h1 className="text-xl font-display font-bold">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Welcome back, Admin</p>
+            <h1 className="text-xl font-display font-bold">Admin Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Manage movies and content</p>
           </div>
-          <Button variant="hero" className="gap-2">
+          <Button variant="hero" className="gap-2" onClick={() => setIsAddModalOpen(true)}>
             <Plus className="w-4 h-4" />
             Add Movie
           </Button>
@@ -177,63 +212,73 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-secondary">
-                  <tr>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Movie</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Category</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Rating</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Year</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMovies.map((movie) => (
-                    <tr key={movie.id} className="border-t border-border hover:bg-secondary/50 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={movie.poster}
-                            alt={movie.title}
-                            className="w-12 h-16 rounded object-cover"
-                          />
-                          <div>
-                            <p className="font-medium">{movie.title}</p>
-                            <p className="text-sm text-muted-foreground">{movie.duration}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 bg-secondary rounded text-sm capitalize">
-                          {movie.category}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="text-primary font-medium">{movie.rating}</span>
-                      </td>
-                      <td className="py-3 px-4 text-muted-foreground">{movie.year}</td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => handleEdit(movie)}
-                            className="p-2 rounded-lg hover:bg-secondary transition-colors"
-                            title="Edit movie"
-                          >
-                            <Edit className="w-4 h-4 text-muted-foreground" />
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(movie.id)}
-                            className="p-2 rounded-lg hover:bg-destructive/20 transition-colors"
-                            title="Delete movie"
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </button>
-                        </div>
-                      </td>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : filteredMovies.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  No movies found. Add your first movie!
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-secondary">
+                    <tr>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Movie</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Category</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Rating</th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Year</th>
+                      <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredMovies.map((movie) => (
+                      <tr key={movie.id} className="border-t border-border hover:bg-secondary/50 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={movie.poster || '/placeholder.svg'}
+                              alt={movie.title}
+                              className="w-12 h-16 rounded object-cover"
+                            />
+                            <div>
+                              <p className="font-medium">{movie.title}</p>
+                              <p className="text-sm text-muted-foreground">{movie.duration}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-1 bg-secondary rounded text-sm capitalize">
+                            {movie.category}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-primary font-medium">{movie.rating}</span>
+                        </td>
+                        <td className="py-3 px-4 text-muted-foreground">{movie.year}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <button 
+                              onClick={() => handleEdit(movie)}
+                              className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                              title="Edit movie"
+                            >
+                              <Edit className="w-4 h-4 text-muted-foreground" />
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(movie.id)}
+                              className="p-2 rounded-lg hover:bg-destructive/20 transition-colors"
+                              title="Delete movie"
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
@@ -248,6 +293,13 @@ const AdminDashboard = () => {
           setEditingMovie(null);
         }}
         onSave={handleSaveMovie}
+      />
+
+      {/* Add Movie Modal */}
+      <AddMovieModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleAddMovie}
       />
     </div>
   );
