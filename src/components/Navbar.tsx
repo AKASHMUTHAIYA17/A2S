@@ -116,11 +116,19 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Link to="/auth">
-              <Button variant="hero" size="sm">
-                Sign In
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/admin">
+                <Button variant="outline" size="sm">
+                  <Shield className="w-4 h-4 mr-1" />
+                  Admin
+                </Button>
+              </Link>
+              <Link to="/auth">
+                <Button variant="hero" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
