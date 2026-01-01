@@ -15,6 +15,7 @@ const MovieDetails = () => {
   
   const movie = movies.find(m => m.id === id);
   const similarMovies = movies.filter(m => m.category === movie?.category && m.id !== id);
+  const playbackUrl = movie?.videoUrl || movie?.trailerUrl;
 
   if (isLoading) {
     return (
@@ -144,9 +145,9 @@ const MovieDetails = () => {
       </section>
 
       {/* Video Player Modal */}
-      {isPlaying && movie.videoUrl && (
+      {isPlaying && playbackUrl && (
         <VideoPlayer
-          videoUrl={movie.videoUrl}
+          videoUrl={playbackUrl}
           poster={movie.poster}
           title={movie.title}
           onClose={() => setIsPlaying(false)}
