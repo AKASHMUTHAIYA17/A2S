@@ -1,18 +1,28 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar } from 'lucide-react';
+import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { MovieRow } from '@/components/MovieRow';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { movies } from '@/data/movies';
+import { useMovies } from '@/hooks/useMovies';
 
 const MovieDetails = () => {
   const { id } = useParams();
   const [isPlaying, setIsPlaying] = useState(false);
+  const { data: movies = [], isLoading } = useMovies();
+  
   const movie = movies.find(m => m.id === id);
   const similarMovies = movies.filter(m => m.category === movie?.category && m.id !== id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!movie) {
     return (
@@ -36,7 +46,7 @@ const MovieDetails = () => {
         {/* Background */}
         <div className="absolute inset-0">
           <img
-            src={movie.banner || movie.poster}
+            src={movie.poster}
             alt={movie.title}
             className="w-full h-full object-cover"
           />
@@ -137,7 +147,7 @@ const MovieDetails = () => {
       {isPlaying && movie.videoUrl && (
         <VideoPlayer
           videoUrl={movie.videoUrl}
-          poster={movie.banner || movie.poster}
+          poster={movie.poster}
           title={movie.title}
           onClose={() => setIsPlaying(false)}
           isFullScreen
