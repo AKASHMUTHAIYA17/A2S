@@ -199,7 +199,7 @@ export const VideoPlayer = ({ videoUrl, poster, title, onClose, isFullScreen = f
   return (
     <div
       ref={containerRef}
-      className={`relative bg-black ${isFullScreen ? 'fixed inset-0 z-50' : 'w-full aspect-video rounded-xl overflow-hidden'}`}
+      className={`relative bg-black flex items-center justify-center ${isFullScreen ? 'fixed inset-0 z-50 w-screen h-screen' : 'w-full aspect-video rounded-xl overflow-hidden'}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
@@ -214,7 +214,7 @@ export const VideoPlayer = ({ videoUrl, poster, title, onClose, isFullScreen = f
         <iframe
           src={embedUrl}
           title={title}
-          className="w-full h-full"
+          className="absolute inset-0 w-full h-full border-0"
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"
