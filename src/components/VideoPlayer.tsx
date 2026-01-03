@@ -196,17 +196,216 @@ export const VideoPlayer = ({ videoUrl, poster, title, onClose, isFullScreen = f
 
   const embedUrl = toEmbedUrl(videoUrl);
 
+  // Netflix-style fullscreen modal
+  if (isFullScreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black">
+        {/* Dark backdrop overlay */}
+        <div className="absolute inset-0 bg-black" />
+        
+        {/* Video container - centered with proper aspect ratio */}
+        <div 
+          ref={containerRef}
+          className="relative w-full h-full flex items-center justify-center"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => isPlaying && setShowControls(false)}
+        >
+          {/* Loading Spinner */}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center z-20">
+              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+
+          {embedUrl ? (
+            <div className="relative w-full h-full max-w-[100vw] max-h-[100vh]">
+              <iframe
+                src={embedUrl}
+                title={title}
+                className="absolute inset-0 w-full h-full"
+                style={{ border: 'none' }}
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+                onLoad={() => setIsLoading(false)}
+              />
+            </div>
+          ) : (
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={poster}
+              className="w-full h-full object-contain"
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              onProgress={handleProgress}
+              onWaiting={() => setIsLoading(true)}
+              onCanPlay={() => setIsLoading(false)}
+              onEnded={() => setIsPlaying(false)}
+              onError={() => setIsLoading(false)}
+              onClick={togglePlay}
+              playsInline
+            />
+          )}
+
+          {/* Play overlay when paused (only for direct video URLs) */}
+          {!embedUrl && !isPlaying && !isLoading && (
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer transition-opacity"
+              onClick={togglePlay}
+            >
+              <div className="w-24 h-24 rounded-full bg-primary/90 flex items-center justify-center shadow-glow transition-transform hover:scale-110">
+                <Play className="w-12 h-12 text-primary-foreground fill-current ml-1" />
+              </div>
+            </div>
+          )}
+
+          {/* Close button - Netflix style top right */}
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`absolute top-6 right-6 z-30 bg-black/70 hover:bg-black/90 backdrop-blur-sm rounded-full h-12 w-12 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}
+              onClick={onClose}
+            >
+              <X className="w-7 h-7 text-white" />
+            </Button>
+          )}
+
+          {/* Title - Netflix style top left */}
+          <div className={`absolute top-0 left-0 right-20 p-6 bg-gradient-to-b from-black/80 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+            <h3 className="text-xl md:text-2xl font-display font-bold text-white drop-shadow-lg">{title}</h3>
+          </div>
+
+          {/* Controls (only for direct video URLs) */}
+          {!embedUrl && (
+            <div
+              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-6 pb-6 pt-20 transition-opacity duration-300 ${
+                showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              {/* Progress bar */}
+              <div
+                className="w-full h-1.5 bg-white/20 rounded-full mb-4 cursor-pointer group relative"
+                onClick={handleProgressClick}
+              >
+                {/* Buffered */}
+                <div
+                  className="absolute h-full bg-white/30 rounded-full"
+                  style={{ width: `${buffered}%` }}
+                />
+                {/* Progress */}
+                <div
+                  className="absolute h-full bg-primary rounded-full transition-all group-hover:h-2"
+                  style={{ width: `${progress}%` }}
+                >
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 md:gap-4">
+                  {/* Play/Pause */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:text-primary hover:bg-white/10 h-12 w-12"
+                    onClick={togglePlay}
+                  >
+                    {isPlaying ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current" />}
+                  </Button>
+                  
+                  {/* Skip Back */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:text-primary hover:bg-white/10 h-12 w-12 hidden sm:flex"
+                    onClick={() => skip(-10)}
+                  >
+                    <SkipBack className="w-6 h-6" />
+                  </Button>
+
+                  {/* Skip Forward */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:text-primary hover:bg-white/10 h-12 w-12 hidden sm:flex"
+                    onClick={() => skip(10)}
+                  >
+                    <SkipForward className="w-6 h-6" />
+                  </Button>
+
+                  {/* Volume */}
+                  <div className="flex items-center gap-2 group">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:text-primary hover:bg-white/10 h-12 w-12"
+                      onClick={toggleMute}
+                    >
+                      {isMuted || volume === 0 ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+                    </Button>
+                    <div className="w-0 overflow-hidden group-hover:w-24 transition-all duration-300">
+                      <Slider
+                        value={[isMuted ? 0 : volume]}
+                        max={1}
+                        step={0.1}
+                        onValueChange={handleVolumeChange}
+                        className="w-24"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Time */}
+                  <span className="text-sm text-white/80 font-mono hidden sm:block">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
+                </div>
+
+                {/* Fullscreen */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:text-primary hover:bg-white/10 h-12 w-12"
+                  onClick={toggleFullscreen}
+                >
+                  {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Fullscreen button for embedded videos - Netflix style bottom right */}
+          {embedUrl && (
+            <div className={`absolute bottom-6 right-6 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:text-primary bg-black/70 hover:bg-black/90 h-12 w-12 rounded-full"
+                onClick={toggleFullscreen}
+                title="Fullscreen"
+              >
+                {isFullscreen ? <Minimize className="w-6 h-6" /> : <Maximize className="w-6 h-6" />}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Non-fullscreen inline player
   return (
     <div
       ref={containerRef}
-      className={`relative bg-black flex items-center justify-center ${isFullScreen ? 'fixed inset-0 z-50 w-screen h-screen' : 'w-full aspect-video rounded-xl overflow-hidden'}`}
+      className="relative bg-black w-full aspect-video rounded-xl overflow-hidden"
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
       {/* Loading Spinner */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black z-20">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
@@ -214,8 +413,9 @@ export const VideoPlayer = ({ videoUrl, poster, title, onClose, isFullScreen = f
         <iframe
           src={embedUrl}
           title={title}
-          className="absolute inset-0 w-full h-full border-0"
-          allow="autoplay; fullscreen; picture-in-picture"
+          className="w-full h-full"
+          style={{ border: 'none' }}
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"
           onLoad={() => setIsLoading(false)}
@@ -238,145 +438,48 @@ export const VideoPlayer = ({ videoUrl, poster, title, onClose, isFullScreen = f
         />
       )}
 
-      {/* Play overlay when paused (only for direct video URLs) */}
+      {/* Play overlay when paused */}
       {!embedUrl && !isPlaying && !isLoading && (
         <div 
-          className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer transition-opacity"
+          className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer"
           onClick={togglePlay}
         >
-          <div className="w-24 h-24 rounded-full bg-primary/90 flex items-center justify-center shadow-glow transition-transform hover:scale-110 animate-pulse-glow">
-            <Play className="w-12 h-12 text-primary-foreground fill-current ml-1" />
+          <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center transition-transform hover:scale-110">
+            <Play className="w-8 h-8 text-primary-foreground fill-current ml-0.5" />
           </div>
         </div>
       )}
 
-      {/* Close button */}
-      {onClose && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`absolute top-4 right-4 z-30 bg-black/60 hover:bg-black/80 backdrop-blur-sm transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}
-          onClick={onClose}
-        >
-          <X className="w-6 h-6" />
-        </Button>
-      )}
-
-      {/* Title & Top Gradient */}
-      <div className={`absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 via-black/40 to-transparent p-6 pt-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-        <h3 className="text-2xl font-display font-bold text-white drop-shadow-lg pr-12">{title}</h3>
-      </div>
-
-      {/* Controls (only for direct video URLs) */}
+      {/* Controls for inline player */}
       {!embedUrl && (
         <div
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-6 pb-6 pt-16 transition-opacity duration-300 ${
+          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12 transition-opacity duration-300 ${
             showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}
         >
-          {/* Progress bar */}
           <div
-            className="w-full h-1.5 bg-muted/30 rounded-full mb-4 cursor-pointer group relative"
+            className="w-full h-1 bg-white/20 rounded-full mb-3 cursor-pointer group"
             onClick={handleProgressClick}
           >
-            {/* Buffered */}
             <div
-              className="absolute h-full bg-muted/50 rounded-full"
-              style={{ width: `${buffered}%` }}
-            />
-            {/* Progress */}
-            <div
-              className="absolute h-full bg-primary rounded-full transition-all group-hover:h-2"
+              className="h-full bg-primary rounded-full"
               style={{ width: `${progress}%` }}
-            >
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
-            </div>
+            />
           </div>
-
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 md:gap-4">
-              {/* Play/Pause */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:text-primary hover:bg-white/10 h-10 w-10"
-                onClick={togglePlay}
-              >
-                {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="text-white h-8 w-8" onClick={togglePlay}>
+                {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
               </Button>
-              
-              {/* Skip Back */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:text-primary hover:bg-white/10 h-10 w-10 hidden sm:flex"
-                onClick={() => skip(-10)}
-              >
-                <SkipBack className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="text-white h-8 w-8" onClick={toggleMute}>
+                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </Button>
-
-              {/* Skip Forward */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:text-primary hover:bg-white/10 h-10 w-10 hidden sm:flex"
-                onClick={() => skip(10)}
-              >
-                <SkipForward className="w-5 h-5" />
-              </Button>
-
-              {/* Volume */}
-              <div className="flex items-center gap-2 group">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:text-primary hover:bg-white/10 h-10 w-10"
-                  onClick={toggleMute}
-                >
-                  {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                </Button>
-                <div className="w-0 overflow-hidden group-hover:w-20 transition-all duration-300">
-                  <Slider
-                    value={[isMuted ? 0 : volume]}
-                    max={1}
-                    step={0.1}
-                    onValueChange={handleVolumeChange}
-                    className="w-20"
-                  />
-                </div>
-              </div>
-
-              {/* Time */}
-              <span className="text-sm text-white/80 font-mono hidden sm:block">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
+              <span className="text-xs text-white/80">{formatTime(currentTime)} / {formatTime(duration)}</span>
             </div>
-
-            {/* Fullscreen */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:text-primary hover:bg-white/10 h-10 w-10"
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+            <Button variant="ghost" size="icon" className="text-white h-8 w-8" onClick={toggleFullscreen}>
+              <Maximize className="w-4 h-4" />
             </Button>
           </div>
-        </div>
-      )}
-
-      {/* Fullscreen button for embedded videos */}
-      {embedUrl && (
-        <div className={`absolute bottom-4 right-4 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:text-primary hover:bg-white/10 h-10 w-10 bg-black/60"
-            onClick={toggleFullscreen}
-            title="Fullscreen"
-          >
-            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-          </Button>
         </div>
       )}
     </div>
