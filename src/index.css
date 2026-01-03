@@ -36,6 +36,17 @@
 
     --radius: 0.75rem;
 
+    /* Mobile-first spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* Responsive container padding */
+    --container-padding: 1rem;
+
     /* Custom OTT tokens */
     --gradient-hero: linear-gradient(135deg, hsl(38 92% 50% / 0.2), hsl(280 80% 50% / 0.1));
     --gradient-card: linear-gradient(180deg, hsl(240 10% 12%), hsl(240 10% 6%));
@@ -53,6 +64,23 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 10% 18%;
     --sidebar-ring: 38 92% 50%;
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --container-padding: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
+      --spacing-2xl: 4rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --container-padding: 2rem;
+      --spacing-xl: 4rem;
+      --spacing-2xl: 6rem;
+    }
   }
 
   .dark {
@@ -83,17 +111,53 @@
     @apply border-border;
   }
 
+  html {
+    @apply scroll-smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
+    @apply leading-tight;
+  }
+
+  /* Mobile-first typography */
+  h1 {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+  }
+
+  h2 {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+
+  h3 {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+
+  /* Touch-friendly tap targets */
+  button, a, [role="button"] {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Fix input zoom on iOS */
+  input, select, textarea {
+    @apply text-base;
   }
 }
 
 @layer components {
+  /* Mobile-first container */
+  .container-mobile {
+    @apply w-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl;
+  }
+
   .text-gradient {
     background: var(--gradient-text);
     -webkit-background-clip: text;
@@ -106,14 +170,26 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .card-glow:hover {
-    box-shadow: var(--glow-primary), var(--glow-card);
-    transform: translateY(-8px) scale(1.02);
+  /* Reduce hover effects on touch devices */
+  @media (hover: hover) {
+    .card-glow:hover {
+      box-shadow: var(--glow-primary), var(--glow-card);
+      transform: translateY(-8px) scale(1.02);
+    }
+  }
+
+  /* Touch-friendly card interaction */
+  @media (hover: none) {
+    .card-glow:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
   }
 
   .glass {
     background: hsl(240 10% 8% / 0.8);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid hsl(240 10% 18% / 0.5);
   }
 
@@ -125,6 +201,36 @@
     background: var(--gradient-overlay);
   }
 
+  /* Mobile-optimized button */
+  .btn-mobile {
+    @apply px-4 py-3 sm:px-6 sm:py-3 text-sm sm:text-base font-medium rounded-lg;
+    @apply transition-all duration-200 active:scale-95;
+  }
+
+  /* Responsive grid */
+  .grid-responsive {
+    @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+    @apply gap-3 sm:gap-4 md:gap-6;
+  }
+
+  /* Mobile navigation */
+  .nav-mobile {
+    @apply fixed bottom-0 left-0 right-0 z-50;
+    @apply flex justify-around items-center;
+    @apply bg-background/95 backdrop-blur-lg border-t border-border;
+    @apply px-2 py-3 safe-area-pb;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-area-pb {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-pt {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+
+  /* Animations - reduced motion support */
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
@@ -140,6 +246,76 @@
   .animate-fade-in {
     animation: fade-in 0.5s ease-out;
   }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-pulse-glow,
+    .animate-slide-up,
+    .animate-fade-in {
+      animation: none;
+    }
+
+    .card-glow {
+      transition: none;
+    }
+  }
+
+  /* Mobile movie card */
+  .movie-card-mobile {
+    @apply relative overflow-hidden rounded-lg;
+    @apply aspect-[2/3] w-full;
+  }
+
+  .movie-card-mobile img {
+    @apply w-full h-full object-cover;
+    @apply transition-transform duration-300;
+  }
+
+  @media (hover: hover) {
+    .movie-card-mobile:hover img {
+      @apply scale-105;
+    }
+  }
+
+  /* Horizontal scroll container */
+  .scroll-container {
+    @apply flex gap-3 sm:gap-4 overflow-x-auto;
+    @apply -mx-4 px-4 sm:-mx-6 sm:px-6;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .scroll-container > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  /* Video player mobile */
+  .video-player-mobile {
+    @apply relative w-full;
+    @apply aspect-video sm:aspect-video;
+  }
+
+  /* Modal mobile */
+  .modal-mobile {
+    @apply fixed inset-x-4 top-1/2 -translate-y-1/2;
+    @apply sm:inset-auto sm:left-1/2 sm:-translate-x-1/2;
+    @apply max-h-[90vh] overflow-y-auto;
+  }
+
+  /* Bottom sheet for mobile */
+  .bottom-sheet {
+    @apply fixed inset-x-0 bottom-0 z-50;
+    @apply bg-card rounded-t-3xl;
+    @apply max-h-[85vh] overflow-y-auto;
+    @apply transform transition-transform duration-300;
+  }
+
+  .bottom-sheet-handle {
+    @apply w-12 h-1.5 bg-muted-foreground/30 rounded-full;
+    @apply mx-auto mt-3 mb-4;
+  }
 }
 
 @layer utilities {
@@ -149,6 +325,39 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Touch action utilities */
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .line-clamp-mobile {
+    @apply line-clamp-2 sm:line-clamp-3;
+  }
+
+  /* Aspect ratio utilities */
+  .aspect-poster {
+    aspect-ratio: 2/3;
+  }
+
+  .aspect-hero {
+    aspect-ratio: 16/9;
+  }
+
+  @media (max-width: 640px) {
+    .aspect-hero {
+      aspect-ratio: 4/3;
+    }
   }
 }
 
