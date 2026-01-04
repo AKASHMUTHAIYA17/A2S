@@ -141,9 +141,9 @@
     @apply text-lg sm:text-xl md:text-2xl;
   }
 
-  /* Touch-friendly tap targets */
+  /* Touch-friendly tap targets (avoid forcing wide pills/buttons) */
   button, a, [role="button"] {
-    @apply min-h-[44px] min-w-[44px];
+    @apply min-h-[44px];
   }
 
   /* Fix input zoom on iOS */
