@@ -27,7 +27,7 @@ export function HeroBanner() {
   };
 
   return (
-    <section className="relative h-[85vh] min-h-[600px] w-full overflow-hidden">
+    <section className="relative h-[70vh] sm:h-[80vh] md:h-[85vh] min-h-[400px] sm:min-h-[500px] md:min-h-[600px] w-full overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
@@ -35,36 +35,36 @@ export function HeroBanner() {
           alt={currentMovie.title}
           className="w-full h-full object-cover transition-all duration-1000"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 sm:via-background/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 sm:via-background/30 to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="relative h-full container mx-auto px-4 flex items-center">
-        <div className="max-w-2xl animate-fade-in">
+      <div className="relative h-full container mx-auto px-4 flex items-end sm:items-center pb-16 sm:pb-0">
+        <div className="max-w-full sm:max-w-xl md:max-w-2xl animate-fade-in">
           {/* Category Badge */}
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-3 py-1 bg-primary/20 border border-primary/30 rounded-full text-primary text-xs font-semibold uppercase tracking-wider">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <span className="px-2 sm:px-3 py-1 bg-primary/20 border border-primary/30 rounded-full text-primary text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
               Featured
             </span>
             <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-primary fill-primary" />
-              <span className="text-sm font-medium">{currentMovie.rating}</span>
+              <Star className="w-3 sm:w-4 h-3 sm:h-4 text-primary fill-primary" />
+              <span className="text-xs sm:text-sm font-medium">{currentMovie.rating}</span>
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-display font-bold mb-2 sm:mb-4 leading-tight">
             {currentMovie.title}
           </h1>
 
           {/* Meta */}
-          <div className="flex items-center gap-4 mb-4 text-muted-foreground text-sm">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4 text-muted-foreground text-xs sm:text-sm">
             <span>{currentMovie.year}</span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground" />
             <span>{currentMovie.duration}</span>
-            <span className="w-1 h-1 rounded-full bg-muted-foreground" />
-            <div className="flex gap-2">
+            <span className="hidden sm:block w-1 h-1 rounded-full bg-muted-foreground" />
+            <div className="hidden sm:flex gap-2">
               {currentMovie.genres.slice(0, 3).map((genre) => (
                 <span key={genre} className="px-2 py-0.5 bg-secondary rounded text-xs">
                   {genre}
@@ -74,21 +74,21 @@ export function HeroBanner() {
           </div>
 
           {/* Description */}
-          <p className="text-muted-foreground text-lg mb-8 line-clamp-3 max-w-xl">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg mb-4 sm:mb-6 md:mb-8 line-clamp-2 sm:line-clamp-3 max-w-full sm:max-w-xl">
             {currentMovie.description}
           </p>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link to={`/movie/${currentMovie.id}`}>
-              <Button variant="hero" size="xl" className="gap-2">
-                <Play className="w-5 h-5 fill-current" />
+              <Button variant="hero" size="default" className="gap-1 sm:gap-2 text-sm sm:text-base px-4 sm:px-6">
+                <Play className="w-4 sm:w-5 h-4 sm:h-5 fill-current" />
                 Watch Now
               </Button>
             </Link>
             <Link to={`/movie/${currentMovie.id}`}>
-              <Button variant="glass" size="xl" className="gap-2">
-                <Info className="w-5 h-5" />
+              <Button variant="glass" size="default" className="gap-1 sm:gap-2 text-sm sm:text-base px-4 sm:px-6">
+                <Info className="w-4 sm:w-5 h-4 sm:h-5" />
                 More Info
               </Button>
             </Link>
@@ -96,33 +96,33 @@ export function HeroBanner() {
         </div>
       </div>
 
-      {/* Navigation Arrows */}
-      <div className="absolute bottom-1/2 translate-y-1/2 left-4 right-4 flex justify-between pointer-events-none">
+      {/* Navigation Arrows - Hidden on mobile */}
+      <div className="hidden sm:flex absolute bottom-1/2 translate-y-1/2 left-4 right-4 justify-between pointer-events-none">
         <button
           onClick={goToPrevious}
-          className="p-3 rounded-full glass hover:bg-foreground/20 transition-colors pointer-events-auto"
+          className="p-2 sm:p-3 rounded-full glass hover:bg-foreground/20 transition-colors pointer-events-auto"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-5 sm:w-6 h-5 sm:h-6" />
         </button>
         <button
           onClick={goToNext}
-          className="p-3 rounded-full glass hover:bg-foreground/20 transition-colors pointer-events-auto"
+          className="p-2 sm:p-3 rounded-full glass hover:bg-foreground/20 transition-colors pointer-events-auto"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-5 sm:w-6 h-5 sm:h-6" />
         </button>
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
         {featuredMovies.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={cn(
-              'h-1.5 rounded-full transition-all duration-300',
+              'h-1 sm:h-1.5 rounded-full transition-all duration-300',
               index === currentIndex
-                ? 'w-8 bg-primary'
-                : 'w-1.5 bg-foreground/30 hover:bg-foreground/50'
+                ? 'w-6 sm:w-8 bg-primary'
+                : 'w-1 sm:w-1.5 bg-foreground/30 hover:bg-foreground/50'
             )}
           />
         ))}

@@ -44,16 +44,16 @@ export function Navbar() {
     <nav
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled ? 'glass py-3' : 'bg-gradient-to-b from-background/80 to-transparent py-4'
+        isScrolled ? 'glass py-2 sm:py-3' : 'bg-gradient-to-b from-background/80 to-transparent py-3 sm:py-4'
       )}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between">
+      <div className="container mx-auto px-3 sm:px-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-            <Play className="w-5 h-5 text-primary-foreground fill-current" />
+        <Link to="/" className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-lg bg-primary flex items-center justify-center">
+            <Play className="w-4 sm:w-5 h-4 sm:h-5 text-primary-foreground fill-current" />
           </div>
-          <span className="text-xl font-display font-bold text-gradient">A2S OTT</span>
+          <span className="text-lg sm:text-xl font-display font-bold text-gradient">A2S OTT</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -147,14 +147,14 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden glass mt-2 mx-4 rounded-xl p-4 animate-slide-up">
-          <div className="flex flex-col gap-2">
+        <div className="md:hidden glass mt-2 mx-3 sm:mx-4 rounded-xl p-3 sm:p-4 animate-slide-up">
+          <div className="flex flex-col gap-1.5 sm:gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={cn(
-                  'px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                  'px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm font-medium transition-colors active:scale-95',
                   location.pathname === link.path
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
@@ -169,26 +169,28 @@ export function Navbar() {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground flex items-center gap-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
+                    <Shield className="w-4 h-4" />
                     Admin Dashboard
                   </Link>
                 )}
                 <Button 
                   variant="outline" 
-                  className="w-full mt-2"
+                  className="w-full mt-2 h-10 sm:h-11"
                   onClick={() => {
                     handleSignOut();
                     setIsMobileMenuOpen(false);
                   }}
                 >
+                  <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </Button>
               </>
             ) : (
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="hero" className="w-full mt-2">
+                <Button variant="hero" className="w-full mt-2 h-10 sm:h-11">
                   Sign In
                 </Button>
               </Link>
