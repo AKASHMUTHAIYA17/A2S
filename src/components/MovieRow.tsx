@@ -26,23 +26,23 @@ export function MovieRow({ title, movies, className }: MovieRowProps) {
   if (movies.length === 0) return null;
 
   return (
-    <section className={cn('py-8', className)}>
-      <div className="container mx-auto px-4">
+    <section className={cn('py-4 sm:py-6 md:py-8', className)}>
+      <div className="container mx-auto px-3 sm:px-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-display font-bold">{title}</h2>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">{title}</h2>
+          <div className="hidden sm:flex items-center gap-2">
             <button
               onClick={() => scroll('left')}
-              className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5" />
             </button>
           </div>
         </div>
@@ -50,13 +50,13 @@ export function MovieRow({ title, movies, className }: MovieRowProps) {
         {/* Scrollable Row */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4"
+          className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2 sm:pb-4 -mx-3 sm:-mx-4 px-3 sm:px-4 snap-x snap-mandatory"
         >
           {movies.map((movie) => (
             <MovieCard
               key={movie.id}
               movie={movie}
-              className="w-[180px] md:w-[200px]"
+              className="w-[120px] sm:w-[150px] md:w-[180px] lg:w-[200px] snap-start"
             />
           ))}
         </div>
