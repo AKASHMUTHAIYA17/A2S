@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { SearchDialog } from './SearchDialog';
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -23,6 +24,7 @@ const navLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -76,7 +78,10 @@ export function Navbar() {
 
         {/* Right Section */}
         <div className="hidden md:flex items-center gap-4">
-          <button className="p-2 hover:bg-secondary rounded-lg transition-colors">
+          <button 
+            className="p-2 hover:bg-secondary rounded-lg transition-colors"
+            onClick={() => setIsSearchOpen(true)}
+          >
             <Search className="w-5 h-5 text-muted-foreground" />
           </button>
           <button className="p-2 hover:bg-secondary rounded-lg transition-colors relative">
@@ -198,6 +203,9 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Search Dialog */}
+      <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </nav>
   );
 }
