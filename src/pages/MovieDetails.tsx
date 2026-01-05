@@ -1,21 +1,51 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2 } from 'lucide-react';
+import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2, Check, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { MovieRow } from '@/components/MovieRow';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { useMovies } from '@/hooks/useMovies';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/hooks/use-toast';
 
 const MovieDetails = () => {
   const { id } = useParams();
   const [isPlaying, setIsPlaying] = useState(false);
   const { data: movies = [], isLoading } = useMovies();
+  const { user } = useAuth();
+  const { isLiked, isInList, toggleLike, toggleMyList } = useFavorites();
   
   const movie = movies.find(m => m.id === id);
   const similarMovies = movies.filter(m => m.category === movie?.category && m.id !== id);
   const playbackUrl = movie?.videoUrl || movie?.trailerUrl;
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: movie?.title,
+          text: movie?.description,
+          url: window.location.href,
+        });
+      } catch (err) {
+        // User cancelled or error
+      }
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({ title: 'Link copied to clipboard!' });
+    }
+  };
+
+  const handleAuthRequired = () => {
+    toast({ 
+      title: 'Sign in required', 
+      description: 'Please sign in to use this feature.',
+      variant: 'destructive'
+    });
+  };
 
   if (isLoading) {
     return (
@@ -128,14 +158,29 @@ const MovieDetails = () => {
                   <Play className="w-5 h-5 fill-current" />
                   Watch Now
                 </Button>
-                <Button variant="glass" size="lg" className="gap-2">
-                  <Plus className="w-5 h-5" />
-                  My List
+                <Button 
+                  variant="glass" 
+                  size="lg" 
+                  className="gap-2"
+                  onClick={() => user ? toggleMyList(movie.id) : handleAuthRequired()}
+                >
+                  {isInList(movie.id) ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                  {isInList(movie.id) ? 'In List' : 'My List'}
                 </Button>
-                <Button variant="glass" size="icon" className="h-12 w-12">
-                  <ThumbsUp className="w-5 h-5" />
+                <Button 
+                  variant="glass" 
+                  size="icon" 
+                  className={`h-12 w-12 ${isLiked(movie.id) ? 'text-primary' : ''}`}
+                  onClick={() => user ? toggleLike(movie.id) : handleAuthRequired()}
+                >
+                  {isLiked(movie.id) ? <Heart className="w-5 h-5 fill-current" /> : <ThumbsUp className="w-5 h-5" />}
                 </Button>
-                <Button variant="glass" size="icon" className="h-12 w-12">
+                <Button 
+                  variant="glass" 
+                  size="icon" 
+                  className="h-12 w-12"
+                  onClick={handleShare}
+                >
                   <Share2 className="w-5 h-5" />
                 </Button>
               </div>
