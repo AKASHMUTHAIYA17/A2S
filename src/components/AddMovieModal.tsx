@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Upload, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Movie } from '@/types/movie';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AddMovieModalProps {
   isOpen: boolean;
@@ -27,8 +29,53 @@ const AddMovieModal = ({ isOpen, onClose, onSave }: AddMovieModalProps) => {
     trailerUrl: '',
     genres: [] as string[],
   });
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a JPG, JPEG, or PNG image');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `posters/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('movie-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('movie-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, poster: publicUrl });
+      setImagePreview(publicUrl);
+      toast.success('Image uploaded successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to upload image');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +94,7 @@ const AddMovieModal = ({ isOpen, onClose, onSave }: AddMovieModalProps) => {
       trailerUrl: '',
       genres: [],
     });
+    setImagePreview(null);
   };
 
   return (
@@ -140,14 +188,37 @@ const AddMovieModal = ({ isOpen, onClose, onSave }: AddMovieModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="poster">Poster URL</Label>
-            <Input
-              id="poster"
-              value={formData.poster}
-              onChange={(e) => setFormData({ ...formData, poster: e.target.value })}
-              className="bg-secondary border-border"
-              placeholder="https://example.com/poster.jpg"
-            />
+            <Label htmlFor="poster">Poster Image</Label>
+            <div className="flex items-center gap-4">
+              <label className="flex-1 cursor-pointer">
+                <div className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-lg hover:border-primary/50 transition-colors ${uploading ? 'opacity-50' : ''}`}>
+                  {uploading ? (
+                    <span className="text-sm text-muted-foreground">Uploading...</span>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {imagePreview ? 'Change image' : 'Upload JPG, JPEG, or PNG'}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept=".jpg,.jpeg,.png"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-16 h-24 object-cover rounded-lg border border-border"
+                />
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
