@@ -15,12 +15,6 @@ const Index = () => {
     ? movies 
     : movies.filter(m => m.category === selectedCategory);
 
-  const actionMovies = movies.filter(m => m.category === 'action');
-  const dramaMovies = movies.filter(m => m.category === 'drama');
-  const sciFiMovies = movies.filter(m => m.category === 'sci-fi');
-  const comedyMovies = movies.filter(m => m.category === 'comedy');
-  const thrillerMovies = movies.filter(m => m.category === 'thriller');
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -48,18 +42,9 @@ const Index = () => {
           <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">
             No movies available yet. Check back soon!
           </div>
-        ) : selectedCategory === 'all' ? (
-          <>
-            <MovieRow title="🔥 Trending Now" movies={movies.slice(0, 6)} />
-            {actionMovies.length > 0 && <MovieRow title="💥 Action & Adventure" movies={actionMovies} />}
-            {dramaMovies.length > 0 && <MovieRow title="🎭 Drama" movies={dramaMovies} />}
-            {sciFiMovies.length > 0 && <MovieRow title="🚀 Sci-Fi" movies={sciFiMovies} />}
-            {comedyMovies.length > 0 && <MovieRow title="😂 Comedy" movies={comedyMovies} />}
-            {thrillerMovies.length > 0 && <MovieRow title="🔪 Thriller" movies={thrillerMovies} />}
-          </>
         ) : (
           <MovieRow 
-            title={`${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Movies`} 
+            title={selectedCategory === 'all' ? '🎬 All Movies' : `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Movies`} 
             movies={filteredMovies} 
           />
         )}
