@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2, Check, Heart } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { MovieRow } from '@/components/MovieRow';
 import { VideoPlayer } from '@/components/VideoPlayer';
+import { MovieJsonLd } from '@/components/MovieJsonLd';
 import { useMovies } from '@/hooks/useMovies';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
@@ -70,6 +72,19 @@ const MovieDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* SEO Meta Tags */}
+      <Helmet>
+        <title>{movie.title} - Watch on A2S OTT</title>
+        <meta name="description" content={movie.description || `Watch ${movie.title} on A2S OTT streaming platform`} />
+        <meta property="og:title" content={`${movie.title} - A2S OTT`} />
+        <meta property="og:description" content={movie.description || ''} />
+        <meta property="og:image" content={movie.poster} />
+        <meta property="og:type" content="video.movie" />
+      </Helmet>
+      
+      {/* JSON-LD Structured Data */}
+      <MovieJsonLd movie={movie} />
+      
       <Navbar />
       
       {/* Hero Section */}
