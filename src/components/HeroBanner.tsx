@@ -113,16 +113,17 @@ export function HeroBanner() {
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 bg-black/30 px-3 py-2 rounded-full backdrop-blur-sm">
         {featuredMovies.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
+            aria-label={`Go to slide ${index + 1}`}
             className={cn(
-              'h-1 sm:h-1.5 rounded-full transition-all duration-300',
+              'transition-all duration-300 rounded-full',
               index === currentIndex
-                ? 'w-6 sm:w-8 bg-primary'
-                : 'w-1 sm:w-1.5 bg-foreground/30 hover:bg-foreground/50'
+                ? 'w-8 sm:w-10 h-2.5 sm:h-3 bg-primary'
+                : 'w-2.5 sm:w-3 h-2.5 sm:h-3 bg-white/50 hover:bg-white/70'
             )}
           />
         ))}

@@ -5,6 +5,7 @@ import { MovieGrid } from '@/components/MovieGrid';
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { Footer } from '@/components/Footer';
 import { useInfiniteMovies } from '@/hooks/useInfiniteMovies';
+import { MovieListJsonLd, WebsiteJsonLd, OrganizationJsonLd } from '@/components/MovieJsonLd';
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -22,6 +23,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data for SEO */}
+      <WebsiteJsonLd />
+      <OrganizationJsonLd />
+      {movies.length > 0 && <MovieListJsonLd movies={movies} />}
+      
       <Navbar />
       
       {/* Hero Section */}
