@@ -72,6 +72,7 @@ export function MovieListJsonLd({ movies }: MovieListJsonLdProps) {
     })),
   };
 
+  // This component only renders a script tag, no ref needed
   return (
     <Helmet>
       <script type="application/ld+json">

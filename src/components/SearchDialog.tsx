@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useMovies } from '@/hooks/useMovies';
 import { Link } from 'react-router-dom';
@@ -32,6 +32,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
       <DialogContent className="sm:max-w-xl p-0 gap-0 overflow-hidden">
         <VisuallyHidden>
           <DialogTitle>Search Movies</DialogTitle>
+          <DialogDescription>Search for movies by title, description, or category</DialogDescription>
         </VisuallyHidden>
         <div className="flex items-center border-b border-border px-4">
           <Search className="w-5 h-5 text-muted-foreground" />
