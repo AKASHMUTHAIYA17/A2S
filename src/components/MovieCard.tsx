@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import React from 'react';
 import { Star, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Movie } from '@/types/movie';
@@ -9,8 +9,8 @@ interface MovieCardProps {
   className?: string;
 }
 
-export const MovieCard = forwardRef<HTMLAnchorElement, MovieCardProps>(
-  ({ movie, className }, ref) => {
+export const MovieCard = React.forwardRef<HTMLAnchorElement, MovieCardProps>(
+  function MovieCard({ movie, className }, ref) {
     return (
       <Link
         ref={ref}
@@ -60,5 +60,3 @@ export const MovieCard = forwardRef<HTMLAnchorElement, MovieCardProps>(
     );
   }
 );
-
-MovieCard.displayName = 'MovieCard';
