@@ -38,14 +38,13 @@ const AddMovieModal = ({ isOpen, onClose, onSave }: AddMovieModalProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
+    // Client-side pre-validation
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!validTypes.includes(file.type)) {
       toast.error('Please upload a JPG, JPEG, or PNG image');
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image must be less than 5MB');
       return;
@@ -53,6 +52,20 @@ const AddMovieModal = ({ isOpen, onClose, onSave }: AddMovieModalProps) => {
 
     setUploading(true);
     try {
+      // Server-side validation using edge function
+      const validationFormData = new FormData();
+      validationFormData.append('file', file);
+
+      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+        'validate-image',
+        { body: validationFormData }
+      );
+
+      if (validationError || !validationResult?.valid) {
+        throw new Error(validationResult?.error || validationError?.message || 'File validation failed');
+      }
+
+      // Upload after server-side validation passes
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `posters/${fileName}`;
