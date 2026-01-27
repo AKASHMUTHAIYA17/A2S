@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Play, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { AppDownloadBadges } from './AppDownloadBadges';
 
 export function Footer() {
   return (
@@ -64,6 +65,12 @@ export function Footer() {
               <li><Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
+            
+            {/* App Download */}
+            <div className="mt-4 pt-4 border-t border-border">
+              <h5 className="font-medium text-xs sm:text-sm mb-2">Get the App</h5>
+              <AppDownloadBadges variant="vertical" size="sm" />
+            </div>
           </div>
         </div>
 

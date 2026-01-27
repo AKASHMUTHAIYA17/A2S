@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Play, Info, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Info, Star, ChevronLeft, ChevronRight, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { movies } from '@/data/movies';
 import { Movie } from '@/types/movie';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-
+import { AppDownloadBadges } from './AppDownloadBadges';
 export function HeroBanner() {
   const featuredMovies = movies.filter((m) => m.featured);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -92,6 +92,13 @@ export function HeroBanner() {
                 More Info
               </Button>
             </Link>
+          </div>
+
+          {/* Mobile App Download - Hidden on very small screens */}
+          <div className="hidden sm:flex items-center gap-2 mt-6 pt-6 border-t border-white/10">
+            <Smartphone className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground mr-2">Get the app:</span>
+            <AppDownloadBadges size="sm" />
           </div>
         </div>
       </div>

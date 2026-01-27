@@ -4,9 +4,9 @@ import { HeroBanner } from '@/components/HeroBanner';
 import { MovieGrid } from '@/components/MovieGrid';
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { Footer } from '@/components/Footer';
+import { AppDownloadSection } from '@/components/AppDownloadSection';
 import { useInfiniteMovies } from '@/hooks/useInfiniteMovies';
 import { MovieListJsonLd, WebsiteJsonLd, OrganizationJsonLd } from '@/components/MovieJsonLd';
-
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const { 
@@ -48,6 +48,9 @@ const Index = () => {
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}
       />
+      
+      {/* App Download Section */}
+      <AppDownloadSection />
       
       <Footer />
     </div>
