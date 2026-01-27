@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PushNotificationProvider } from "@/components/PushNotificationProvider";
 import Index from "./pages/Index";
 import MovieDetails from "./pages/MovieDetails";
 import Auth from "./pages/Auth";
@@ -24,34 +25,36 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/movies" element={<Index />} />
-                <Route path="/categories" element={<Index />} />
-                <Route path="/movie/:id" element={<MovieDetails />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <ProtectedRoute requireAdmin>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/subscription" element={<Subscription />} />
-                <Route path="/help" element={<HelpCenter />} />
-                <Route path="/terms" element={<TermsOfService />} />
-                <Route path="/privacy" element={<PrivacyPolicy />} />
-                <Route path="/contact" element={<Contact />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
+          <PushNotificationProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/movies" element={<Index />} />
+                  <Route path="/categories" element={<Index />} />
+                  <Route path="/movie/:id" element={<MovieDetails />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="/subscription" element={<Subscription />} />
+                  <Route path="/help" element={<HelpCenter />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/contact" element={<Contact />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </PushNotificationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>
