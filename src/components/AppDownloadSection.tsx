@@ -1,10 +1,10 @@
-import { Smartphone, Zap, Download, Wifi } from 'lucide-react';
+import { Smartphone, Zap, Download, Wifi, Film } from 'lucide-react';
 import { AppDownloadBadges } from './AppDownloadBadges';
 
 export function AppDownloadSection() {
   const features = [
     { icon: Zap, text: 'Instant streaming' },
-    { icon: Download, text: 'Download & watch offline' },
+    { icon: Film, text: 'All movies from the site' },
     { icon: Wifi, text: 'Watch anywhere' },
   ];
 
@@ -43,15 +43,15 @@ export function AppDownloadSection() {
           <div className="flex-1 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
               <Smartphone className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Mobile App</span>
+              <span className="text-sm font-medium text-primary">Install from Website</span>
             </div>
             
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-4">
-              Download the <span className="text-gradient">A2S OTT</span> App
+              Install the <span className="text-gradient">A2S OTT</span> App
             </h2>
             
             <p className="text-muted-foreground text-base sm:text-lg mb-6 max-w-lg mx-auto lg:mx-0">
-              Take your entertainment everywhere. Download our mobile app for the best streaming experience on the go.
+              No app store needed! Install directly from this website and get access to all the movies available on the site — right on your phone.
             </p>
 
             {/* Features */}
@@ -64,7 +64,7 @@ export function AppDownloadSection() {
               ))}
             </div>
 
-            {/* Download Badges */}
+            {/* Install Button */}
             <AppDownloadBadges size="lg" className="justify-center lg:justify-start" />
           </div>
         </div>

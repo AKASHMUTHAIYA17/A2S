@@ -1,4 +1,6 @@
-import { Apple, Smartphone } from 'lucide-react';
+import { Download, CheckCircle, Smartphone } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface AppDownloadBadgesProps {
   variant?: 'horizontal' | 'vertical';
@@ -11,10 +13,12 @@ export function AppDownloadBadges({
   size = 'md',
   className = '' 
 }: AppDownloadBadgesProps) {
+  const { isInstallable, isInstalled, install } = usePwaInstall();
+
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-4 py-2.5 text-sm gap-2',
-    lg: 'px-5 py-3 text-base gap-2.5'
+    sm: 'h-9 text-xs px-3',
+    md: 'h-10 text-sm px-4',
+    lg: 'h-12 text-base px-6'
   };
 
   const iconSizes = {
@@ -23,35 +27,40 @@ export function AppDownloadBadges({
     lg: 'w-6 h-6'
   };
 
+  if (isInstalled) {
+    return (
+      <div className={`flex items-center gap-2 text-primary ${className}`}>
+        <CheckCircle className={iconSizes[size]} />
+        <span className={size === 'sm' ? 'text-xs' : 'text-sm'}>App Installed!</span>
+      </div>
+    );
+  }
+
+  if (isInstallable) {
+    return (
+      <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
+        <Button
+          onClick={install}
+          className={`${sizeClasses[size]} gap-2`}
+          variant="default"
+        >
+          <Download className={iconSizes[size]} />
+          Install A2S OTT App
+        </Button>
+      </div>
+    );
+  }
+
+  // Fallback: show instructions for browsers that don't support install prompt
   return (
     <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
-      {/* Google Play Store */}
-      <a
-        href="https://play.google.com/store/apps/details?id=app.lovable.889ffb0fced4489086d391287e863f5b"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`flex items-center ${sizeClasses[size]} bg-secondary hover:bg-secondary/80 rounded-lg transition-all duration-200 hover:scale-105 border border-border`}
-      >
+      <div className={`flex items-center gap-2 ${sizeClasses[size]} bg-secondary rounded-lg border border-border px-3`}>
         <Smartphone className={iconSizes[size]} />
         <div className="flex flex-col items-start leading-tight">
-          <span className="text-[10px] text-muted-foreground">GET IT ON</span>
-          <span className="font-semibold">Google Play</span>
+          <span className="text-[10px] text-muted-foreground">Open in browser &</span>
+          <span className="font-semibold text-xs">Add to Home Screen</span>
         </div>
-      </a>
-
-      {/* Apple App Store */}
-      <a
-        href="https://apps.apple.com/app/a2sott/id123456789"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`flex items-center ${sizeClasses[size]} bg-secondary hover:bg-secondary/80 rounded-lg transition-all duration-200 hover:scale-105 border border-border`}
-      >
-        <Apple className={iconSizes[size]} />
-        <div className="flex flex-col items-start leading-tight">
-          <span className="text-[10px] text-muted-foreground">Download on the</span>
-          <span className="font-semibold">App Store</span>
-        </div>
-      </a>
+      </div>
     </div>
   );
 }
