@@ -68,7 +68,7 @@ export function Footer() {
             
             {/* App Download */}
             <div className="mt-4 pt-4 border-t border-border">
-              <h5 className="font-medium text-xs sm:text-sm mb-2">Get the App</h5>
+              <h5 className="font-medium text-xs sm:text-sm mb-2">Install the App</h5>
               <AppDownloadBadges variant="vertical" size="sm" />
             </div>
           </div>

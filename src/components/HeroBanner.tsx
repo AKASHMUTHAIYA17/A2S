@@ -94,10 +94,10 @@ export function HeroBanner() {
             </Link>
           </div>
 
-          {/* Mobile App Download - Hidden on very small screens */}
+          {/* Mobile App Install - Hidden on very small screens */}
           <div className="hidden sm:flex items-center gap-2 mt-6 pt-6 border-t border-white/10">
             <Smartphone className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground mr-2">Get the app:</span>
+            <span className="text-xs text-muted-foreground mr-2">Install app:</span>
             <AppDownloadBadges size="sm" />
           </div>
         </div>

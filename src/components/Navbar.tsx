@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, X, Play, LogOut, Shield, Smartphone } from 'lucide-react';
+import { Search, Bell, Menu, X, Play, LogOut, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+// AppDownloadBadges now handles PWA install directly
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { SearchDialog } from './SearchDialog';
 import { AppDownloadBadges } from './AppDownloadBadges';
@@ -78,19 +79,8 @@ export function Navbar() {
 
         {/* Right Section */}
         <div className="hidden md:flex items-center gap-4">
-          {/* Get App Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Smartphone className="w-4 h-4" />
-                Get App
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="p-4">
-              <p className="text-sm font-medium mb-3">Download the A2S OTT App</p>
-              <AppDownloadBadges variant="vertical" size="sm" />
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Install App */}
+          <AppDownloadBadges size="sm" />
           
           <button 
             className="p-2 hover:bg-secondary rounded-lg transition-colors"
