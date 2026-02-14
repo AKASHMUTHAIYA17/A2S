@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "og-image.png"],
+      includeAssets: ["app-icon.png", "og-image.png"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}"],
@@ -32,12 +32,7 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
-            src: "/favicon.ico",
-            sizes: "64x64",
-            type: "image/x-icon",
-          },
-          {
-            src: "/og-image.png",
+            src: "/app-icon.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
