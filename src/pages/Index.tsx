@@ -6,8 +6,10 @@ import { CategoryFilter } from '@/components/CategoryFilter';
 import { Footer } from '@/components/Footer';
 import { AppDownloadSection } from '@/components/AppDownloadSection';
 import { useInfiniteMovies } from '@/hooks/useInfiniteMovies';
+import { useRealtimeMovies } from '@/hooks/useMovies';
 import { MovieListJsonLd, WebsiteJsonLd, OrganizationJsonLd } from '@/components/MovieJsonLd';
 const Index = () => {
+  useRealtimeMovies();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const { 
     data, 
