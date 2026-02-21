@@ -168,7 +168,7 @@ const MovieDetails = () => {
                   variant="hero" 
                   size="xl" 
                   className="gap-2"
-                  onClick={() => setIsPlaying(true)}
+                  onClick={() => user ? setIsPlaying(true) : handleAuthRequired()}
                 >
                   <Play className="w-5 h-5 fill-current" />
                   Watch Now
