@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { MovieRow } from '@/components/MovieRow';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { MovieJsonLd } from '@/components/MovieJsonLd';
+import { AuthModal } from '@/components/AuthModal';
 import { useMovies } from '@/hooks/useMovies';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +17,7 @@ import { toast } from '@/hooks/use-toast';
 const MovieDetails = () => {
   const { id } = useParams();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { data: movies = [], isLoading } = useMovies();
   const { user } = useAuth();
   const { isLiked, isInList, toggleLike, toggleMyList } = useFavorites();
@@ -42,11 +44,7 @@ const MovieDetails = () => {
   };
 
   const handleAuthRequired = () => {
-    toast({ 
-      title: 'Sign in required', 
-      description: 'Please sign in to use this feature.',
-      variant: 'destructive'
-    });
+    setShowAuthModal(true);
   };
 
   if (isLoading) {
@@ -220,6 +218,7 @@ const MovieDetails = () => {
       )}
 
       <Footer />
+      <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
 };
