@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -37,6 +38,26 @@ export const toFrontendMovie = (m: DbMovie) => ({
 });
 
 export function useMovies() {
+  const queryClient = useQueryClient();
+
+  // Subscribe to realtime changes on the movies table
+  useEffect(() => {
+    const channel = supabase
+      .channel('movies-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'movies' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['movies'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ['movies'],
     queryFn: async () => {
