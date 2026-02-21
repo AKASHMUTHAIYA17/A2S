@@ -37,10 +37,9 @@ export const toFrontendMovie = (m: DbMovie) => ({
   genres: [],
 });
 
-export function useMovies() {
+export function useRealtimeMovies() {
   const queryClient = useQueryClient();
 
-  // Subscribe to realtime changes on the movies table
   useEffect(() => {
     const channel = supabase
       .channel('movies-realtime')
@@ -57,7 +56,9 @@ export function useMovies() {
       supabase.removeChannel(channel);
     };
   }, [queryClient]);
+}
 
+export function useMovies() {
   return useQuery({
     queryKey: ['movies'],
     queryFn: async () => {
