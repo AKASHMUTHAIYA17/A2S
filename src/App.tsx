@@ -3,7 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
+import { Helmet, HelmetProvider } from "react-helmet-async";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PushNotificationProvider } from "@/components/PushNotificationProvider";
@@ -20,6 +21,17 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const DynamicFavicon = () => {
+  const { logoUrl } = useSiteSettings();
+  if (!logoUrl) return null;
+  return (
+    <Helmet>
+      <link rel="icon" href={logoUrl} type="image/png" />
+      <link rel="apple-touch-icon" href={logoUrl} />
+    </Helmet>
+  );
+};
+
 const App = () => {
   return (
     <HelmetProvider>
@@ -27,6 +39,7 @@ const App = () => {
         <AuthProvider>
           <PushNotificationProvider>
             <TooltipProvider>
+              <DynamicFavicon />
               <Toaster />
               <Sonner />
               <BrowserRouter>
