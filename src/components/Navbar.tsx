@@ -4,6 +4,7 @@ import { Search, Bell, Menu, X, Play, LogOut, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-// AppDownloadBadges now handles PWA install directly
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { SearchDialog } from './SearchDialog';
 import { AppDownloadBadges } from './AppDownloadBadges';
@@ -29,6 +29,7 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
+  const { logoUrl } = useSiteSettings();
 
   useState(() => {
     const handleScroll = () => {
@@ -53,9 +54,13 @@ export function Navbar() {
       <div className="container mx-auto px-3 sm:px-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-1.5 sm:gap-2">
-          <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-lg bg-primary flex items-center justify-center">
-            <Play className="w-4 sm:w-5 h-4 sm:h-5 text-primary-foreground fill-current" />
-          </div>
+          {logoUrl ? (
+            <img src={logoUrl} alt="A2S OTT" className="w-8 sm:w-10 h-8 sm:h-10 rounded-lg object-contain" />
+          ) : (
+            <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-lg bg-primary flex items-center justify-center">
+              <Play className="w-4 sm:w-5 h-4 sm:h-5 text-primary-foreground fill-current" />
+            </div>
+          )}
           <span className="text-lg sm:text-xl font-display font-bold text-gradient">A2S OTT</span>
         </Link>
 

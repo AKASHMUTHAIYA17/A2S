@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -14,16 +14,21 @@ import {
   Play,
   Menu,
   X,
-  Loader2
+  Loader2,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useMovies, useUpdateMovie, useDeleteMovie, useCreateMovie } from '@/hooks/useMovies';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 import EditMovieModal from '@/components/EditMovieModal';
 import AddMovieModal from '@/components/AddMovieModal';
 import { Movie } from '@/types/movie';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const sidebarLinks = [
   { name: 'Dashboard', icon: LayoutDashboard, active: true },
@@ -40,9 +45,14 @@ const AdminDashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { data: movies = [], isLoading } = useMovies();
+  const { logoUrl, updateLogo } = useSiteSettings();
+  const { toast } = useToast();
   const updateMovie = useUpdateMovie();
   const deleteMovie = useDeleteMovie();
   const createMovie = useCreateMovie();
@@ -103,6 +113,47 @@ const AdminDashboard = () => {
     deleteMovie.mutate(id);
   };
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({ title: 'Invalid file type', description: 'Please upload a JPG, PNG, WebP, or SVG file.', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Logo must be under 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `branding/logo-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('movie-images').upload(filePath, file);
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('movie-images').getPublicUrl(filePath);
+      await updateLogo(publicUrl);
+      toast({ title: 'Logo updated', description: 'Your new logo is now live across the site.' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    try {
+      await updateLogo(null);
+      toast({ title: 'Logo removed', description: 'Default logo restored.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/');
@@ -120,9 +171,13 @@ const AdminDashboard = () => {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-border">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
-              <Play className="w-5 h-5 text-primary-foreground fill-current" />
-            </div>
+            {logoUrl ? (
+              <img src={logoUrl} alt="A2S Admin" className="w-10 h-10 rounded-lg object-contain flex-shrink-0" />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                <Play className="w-5 h-5 text-primary-foreground fill-current" />
+              </div>
+            )}
             {sidebarOpen && (
               <span className="text-lg font-display font-bold text-gradient">A2S Admin</span>
             )}
@@ -182,6 +237,53 @@ const AdminDashboard = () => {
 
         {/* Content */}
         <div className="p-6 space-y-6">
+          {/* Branding */}
+          <div className="glass rounded-xl p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5" />
+              Branding
+            </h2>
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-xl border border-border flex items-center justify-center overflow-hidden bg-secondary">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Current logo" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="w-full h-full bg-primary flex items-center justify-center">
+                    <Play className="w-8 h-8 text-primary-foreground fill-current" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Upload a logo to replace the default icon across the site, navbar, and mobile app icon.
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => logoInputRef.current?.click()}
+                    disabled={isUploadingLogo}
+                  >
+                    {isUploadingLogo ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                    Upload Logo
+                  </Button>
+                  {logoUrl && (
+                    <Button variant="outline" size="sm" onClick={handleRemoveLogo}>
+                      Remove
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat) => (
