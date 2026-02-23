@@ -5,16 +5,16 @@ import { supabase } from '@/integrations/supabase/client';
 export function useSiteSettings() {
   const queryClient = useQueryClient();
 
-  const { data: logoUrl, isLoading } = useQuery({
-    queryKey: ['site-settings', 'logo_url'],
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('value')
-        .eq('key', 'logo_url')
-        .single();
+        .select('key, value');
       if (error) throw error;
-      return data?.value || null;
+      const map: Record<string, string | null> = {};
+      data?.forEach((row) => { map[row.key] = row.value; });
+      return map;
     },
   });
 
@@ -36,13 +36,21 @@ export function useSiteSettings() {
     };
   }, [queryClient]);
 
-  const updateLogo = async (url: string | null) => {
+  const updateSetting = async (key: string, value: string | null) => {
     const { error } = await supabase
       .from('site_settings')
-      .update({ value: url })
-      .eq('key', 'logo_url');
+      .upsert({ key, value }, { onConflict: 'key' });
     if (error) throw error;
   };
 
-  return { logoUrl: logoUrl as string | null, isLoading, updateLogo };
+  const updateLogo = (url: string | null) => updateSetting('logo_url', url);
+  const updateApkUrl = (url: string | null) => updateSetting('apk_url', url);
+
+  return {
+    logoUrl: (settings?.logo_url ?? null) as string | null,
+    apkUrl: (settings?.apk_url ?? null) as string | null,
+    isLoading,
+    updateLogo,
+    updateApkUrl,
+  };
 }
