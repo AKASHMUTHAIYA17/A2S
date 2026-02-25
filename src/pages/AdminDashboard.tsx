@@ -16,7 +16,6 @@ import {
   X,
   Loader2,
   Upload,
-  Download,
   Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -47,14 +46,12 @@ const AdminDashboard = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
-  const [isUploadingApk, setIsUploadingApk] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
-  const apkInputRef = useRef<HTMLInputElement>(null);
   
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { data: movies = [], isLoading } = useMovies();
-  const { logoUrl, apkUrl, updateLogo, updateApkUrl } = useSiteSettings();
+  const { logoUrl, updateLogo } = useSiteSettings();
   const { toast } = useToast();
   const updateMovie = useUpdateMovie();
   const deleteMovie = useDeleteMovie();
@@ -157,44 +154,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleApkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    if (!file.name.endsWith('.apk')) {
-      toast({ title: 'Invalid file type', description: 'Please upload an APK file.', variant: 'destructive' });
-      return;
-    }
-    if (file.size > 200 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'APK must be under 200MB.', variant: 'destructive' });
-      return;
-    }
-
-    setIsUploadingApk(true);
-    try {
-      const filePath = `a2sott-${Date.now()}.apk`;
-      const { error: uploadError } = await supabase.storage.from('app-downloads').upload(filePath, file);
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage.from('app-downloads').getPublicUrl(filePath);
-      await updateApkUrl(publicUrl);
-      toast({ title: 'APK uploaded', description: 'The download link is now live across the site.' });
-    } catch (err: any) {
-      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
-    } finally {
-      setIsUploadingApk(false);
-      if (apkInputRef.current) apkInputRef.current.value = '';
-    }
-  };
-
-  const handleRemoveApk = async () => {
-    try {
-      await updateApkUrl(null);
-      toast({ title: 'APK removed', description: 'Download link removed from the site.' });
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
-    }
-  };
 
   const handleLogout = async () => {
     await signOut();
@@ -322,48 +281,6 @@ const AdminDashboard = () => {
                     </Button>
                   )}
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* APK Management */}
-          <div className="glass rounded-xl p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Download className="w-5 h-5" />
-              Mobile App (APK)
-            </h2>
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Upload an Android APK file. Users will see a "Download APK" button on the site.
-              </p>
-              {apkUrl && (
-                <div className="flex items-center gap-2 text-sm text-primary">
-                  <Download className="w-4 h-4" />
-                  <a href={apkUrl} className="underline truncate max-w-xs" target="_blank" rel="noopener noreferrer">Current APK</a>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <input
-                  ref={apkInputRef}
-                  type="file"
-                  accept=".apk"
-                  className="hidden"
-                  onChange={handleApkUpload}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => apkInputRef.current?.click()}
-                  disabled={isUploadingApk}
-                >
-                  {isUploadingApk ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-                  Upload APK
-                </Button>
-                {apkUrl && (
-                  <Button variant="outline" size="sm" onClick={handleRemoveApk}>
-                    Remove
-                  </Button>
-                )}
               </div>
             </div>
           </div>
