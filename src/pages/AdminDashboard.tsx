@@ -16,6 +16,7 @@ import {
   X,
   Loader2,
   Upload,
+  Download,
   Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,7 @@ const AdminDashboard = () => {
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [apkInput, setApkInput] = useState('');
   
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +53,7 @@ const AdminDashboard = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { data: movies = [], isLoading } = useMovies();
-  const { logoUrl, updateLogo } = useSiteSettings();
+  const { logoUrl, apkUrl, updateLogo, updateApkUrl } = useSiteSettings();
   const { toast } = useToast();
   const updateMovie = useUpdateMovie();
   const deleteMovie = useDeleteMovie();
@@ -281,6 +283,65 @@ const AdminDashboard = () => {
                     </Button>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* APK Download Link */}
+          <div className="glass rounded-xl p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Download className="w-5 h-5" />
+              Mobile App Download Link
+            </h2>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Paste your APK download URL. Users will see a "Download App" button on the site.
+              </p>
+              {apkUrl && (
+                <div className="flex items-center gap-2 text-sm text-primary">
+                  <Download className="w-4 h-4" />
+                  <a href={apkUrl} className="underline truncate max-w-xs" target="_blank" rel="noopener noreferrer">Current APK Link</a>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="https://example.com/your-app.apk"
+                  value={apkInput}
+                  onChange={(e) => setApkInput(e.target.value)}
+                  className="max-w-md bg-secondary border-border"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    if (!apkInput.trim()) return;
+                    try {
+                      await updateApkUrl(apkInput.trim());
+                      toast({ title: 'APK link saved', description: 'Download link is now live on the site.' });
+                      setApkInput('');
+                    } catch (err: any) {
+                      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+                    }
+                  }}
+                >
+                  Save
+                </Button>
+                {apkUrl && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        await updateApkUrl(null);
+                        toast({ title: 'APK link removed' });
+                      } catch (err: any) {
+                        toast({ title: 'Error', description: err.message, variant: 'destructive' });
+                      }
+                    }}
+                  >
+                    Remove
+                  </Button>
+                )}
               </div>
             </div>
           </div>
