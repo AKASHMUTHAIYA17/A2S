@@ -1,7 +1,6 @@
 import { Download, CheckCircle, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
-import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface AppDownloadBadgesProps {
   variant?: 'horizontal' | 'vertical';
@@ -14,8 +13,7 @@ export function AppDownloadBadges({
   size = 'md',
   className = '' 
 }: AppDownloadBadgesProps) {
-  const { isInstalled } = usePwaInstall();
-  const { apkUrl } = useSiteSettings();
+  const { isInstallable, isInstalled, install } = usePwaInstall();
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -38,31 +36,29 @@ export function AppDownloadBadges({
     );
   }
 
-  if (apkUrl) {
+  if (isInstallable) {
     return (
       <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
         <Button
-          asChild
+          onClick={install}
           className={`${sizeClasses[size]} gap-2`}
           variant="default"
         >
-          <a href={apkUrl} download>
-            <Download className={iconSizes[size]} />
-            Download A2S OTT App
-          </a>
+          <Download className={iconSizes[size]} />
+          Download A2S OTT App
         </Button>
       </div>
     );
   }
 
-  // Fallback
+  // Fallback for browsers that don't support install prompt
   return (
     <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
       <div className={`flex items-center gap-2 ${sizeClasses[size]} bg-secondary rounded-lg border border-border px-3`}>
         <Smartphone className={iconSizes[size]} />
         <div className="flex flex-col items-start leading-tight">
-          <span className="text-[10px] text-muted-foreground">Coming soon</span>
-          <span className="font-semibold text-xs">Download App</span>
+          <span className="text-[10px] text-muted-foreground">Open in browser &</span>
+          <span className="font-semibold text-xs">Add to Home Screen</span>
         </div>
       </div>
     </div>
