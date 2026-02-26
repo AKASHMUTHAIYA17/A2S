@@ -1,7 +1,6 @@
-import { Download, CheckCircle, Smartphone } from 'lucide-react';
+import { Download, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
-import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface AppDownloadBadgesProps {
   variant?: 'horizontal' | 'vertical';
@@ -15,7 +14,6 @@ export function AppDownloadBadges({
   className = '' 
 }: AppDownloadBadgesProps) {
   const { isInstallable, isInstalled, install } = usePwaInstall();
-  const { apkUrl } = useSiteSettings();
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -38,50 +36,25 @@ export function AppDownloadBadges({
     );
   }
 
-  // If there's a direct APK download URL, always show that
-  if (apkUrl) {
-    return (
-      <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
-        <Button
-          asChild
-          className={`${sizeClasses[size]} gap-2`}
-          variant="default"
-        >
-          <a href={apkUrl} download target="_blank" rel="noopener noreferrer">
-            <Download className={iconSizes[size]} />
-            Download A2S OTT App
-          </a>
-        </Button>
-      </div>
-    );
-  }
+  const handleDownload = () => {
+    if (isInstallable) {
+      install();
+    } else {
+      // Open the published site directly so PWA install prompt can trigger
+      window.open(window.location.origin, '_blank');
+    }
+  };
 
-  // PWA install prompt
-  if (isInstallable) {
-    return (
-      <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
-        <Button
-          onClick={install}
-          className={`${sizeClasses[size]} gap-2`}
-          variant="default"
-        >
-          <Download className={iconSizes[size]} />
-          Download A2S OTT App
-        </Button>
-      </div>
-    );
-  }
-
-  // Fallback
   return (
     <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
-      <div className={`flex items-center gap-2 ${sizeClasses[size]} bg-secondary rounded-lg border border-border px-3`}>
-        <Smartphone className={iconSizes[size]} />
-        <div className="flex flex-col items-start leading-tight">
-          <span className="text-[10px] text-muted-foreground">Open in browser &</span>
-          <span className="font-semibold text-xs">Add to Home Screen</span>
-        </div>
-      </div>
+      <Button
+        onClick={handleDownload}
+        className={`${sizeClasses[size]} gap-2`}
+        variant="default"
+      >
+        <Download className={iconSizes[size]} />
+        Download A2S OTT App
+      </Button>
     </div>
   );
 }
