@@ -1,6 +1,6 @@
-import { Download } from 'lucide-react';
+import { Download, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface AppDownloadBadgesProps {
   variant?: 'horizontal' | 'vertical';
@@ -13,7 +13,7 @@ export function AppDownloadBadges({
   size = 'md',
   className = '' 
 }: AppDownloadBadgesProps) {
-  const { apkUrl } = useSiteSettings();
+  const { isInstallable, isInstalled, install } = usePwaInstall();
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -27,16 +27,34 @@ export function AppDownloadBadges({
     lg: 'w-6 h-6'
   };
 
-  const handleDownload = () => {
-    if (apkUrl) {
-      const link = document.createElement('a');
-      link.href = apkUrl;
-      link.download = 'A2S-OTT.apk';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  if (isInstalled) {
+    return (
+      <div className={`flex items-center gap-2 text-primary ${className}`}>
+        <CheckCircle className={iconSizes[size]} />
+        <span className={size === 'sm' ? 'text-xs' : 'text-sm'}>App Installed!</span>
+      </div>
+    );
+  }
+
+  const handleDownload = async () => {
+    if (isInstallable) {
+      await install();
     } else {
-      window.alert('APK not available yet. Please contact admin.');
+      // If in preview or install not available, open published site where PWA install works
+      const publishedUrl = 'https://a2sott.lovable.app';
+      const isPreview = window.location.hostname.includes('id-preview--') || window.location.hostname.includes('lovableproject.com');
+      
+      if (isPreview) {
+        window.location.href = publishedUrl;
+      } else {
+        // On the actual site but install prompt didn't fire - show instructions
+        const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isiOS) {
+          window.alert('Tap the Share button (□↑) at the bottom → then tap "Add to Home Screen" to install the app.');
+        } else {
+          window.alert('Tap the browser menu (⋮) → tap "Install app" or "Add to Home Screen" to download the app.');
+        }
+      }
     }
   };
 
