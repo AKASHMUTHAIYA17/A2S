@@ -42,11 +42,13 @@ export function AppDownloadBadges({
       if (accepted) return;
     }
 
-    const isPreviewHost = window.location.hostname.includes('id-preview--');
-    const publishedUrl = 'https://a2sott.lovable.app';
+    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-    // In preview iframe, install prompt won't reliably appear, so open the live app URL
-    window.open(isPreviewHost ? publishedUrl : window.location.origin, '_blank', 'noopener,noreferrer');
+    if (isiOS) {
+      window.alert('To install: tap Share (square with arrow) → Add to Home Screen.');
+    } else {
+      window.alert('To install: open browser menu (⋮) → Install app / Add to Home screen.');
+    }
   };
 
   return (
