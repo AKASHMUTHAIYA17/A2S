@@ -1,6 +1,6 @@
-import { Download, CheckCircle } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { usePwaInstall } from '@/hooks/usePwaInstall';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface AppDownloadBadgesProps {
   variant?: 'horizontal' | 'vertical';
@@ -13,7 +13,7 @@ export function AppDownloadBadges({
   size = 'md',
   className = '' 
 }: AppDownloadBadgesProps) {
-  const { isInstallable, isInstalled, install } = usePwaInstall();
+  const { apkUrl } = useSiteSettings();
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -27,27 +27,16 @@ export function AppDownloadBadges({
     lg: 'w-6 h-6'
   };
 
-  if (isInstalled) {
-    return (
-      <div className={`flex items-center gap-2 text-primary ${className}`}>
-        <CheckCircle className={iconSizes[size]} />
-        <span className={size === 'sm' ? 'text-xs' : 'text-sm'}>App Installed!</span>
-      </div>
-    );
-  }
-
-  const handleDownload = async () => {
-    if (isInstallable) {
-      const accepted = await install();
-      if (accepted) return;
-    }
-
-    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-    if (isiOS) {
-      window.alert('To install: tap Share (square with arrow) → Add to Home Screen.');
+  const handleDownload = () => {
+    if (apkUrl) {
+      const link = document.createElement('a');
+      link.href = apkUrl;
+      link.download = 'A2S-OTT.apk';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
-      window.alert('To install: open browser menu (⋮) → Install app / Add to Home screen.');
+      window.alert('APK not available yet. Please contact admin.');
     }
   };
 
