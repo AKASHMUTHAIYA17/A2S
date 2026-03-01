@@ -39,22 +39,14 @@ export function AppDownloadBadges({
   const handleDownload = async () => {
     if (isInstallable) {
       await install();
+      return;
+    }
+
+    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isiOS) {
+      window.alert('To install this app on iPhone: tap Share (□↑) → Add to Home Screen.');
     } else {
-      // If in preview or install not available, open published site where PWA install works
-      const publishedUrl = 'https://a2sott.lovable.app';
-      const isPreview = window.location.hostname.includes('id-preview--') || window.location.hostname.includes('lovableproject.com');
-      
-      if (isPreview) {
-        window.location.href = publishedUrl;
-      } else {
-        // On the actual site but install prompt didn't fire - show instructions
-        const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        if (isiOS) {
-          window.alert('Tap the Share button (□↑) at the bottom → then tap "Add to Home Screen" to install the app.');
-        } else {
-          window.alert('Tap the browser menu (⋮) → tap "Install app" or "Add to Home Screen" to download the app.');
-        }
-      }
+      window.alert('Install is not available in this browser view. Open this same site in Chrome mobile and tap Install app / Add to Home screen from the browser menu.');
     }
   };
 
