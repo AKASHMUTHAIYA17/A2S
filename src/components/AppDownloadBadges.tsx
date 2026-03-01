@@ -36,13 +36,17 @@ export function AppDownloadBadges({
     );
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (isInstallable) {
-      install();
-    } else {
-      // Open the published site directly so PWA install prompt can trigger
-      window.open(window.location.origin, '_blank');
+      const accepted = await install();
+      if (accepted) return;
     }
+
+    const isPreviewHost = window.location.hostname.includes('id-preview--');
+    const publishedUrl = 'https://a2sott.lovable.app';
+
+    // In preview iframe, install prompt won't reliably appear, so open the live app URL
+    window.open(isPreviewHost ? publishedUrl : window.location.origin, '_blank', 'noopener,noreferrer');
   };
 
   return (
