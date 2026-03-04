@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}"],
       },
+      devOptions: {
+        enabled: true,
+      },
       manifest: {
         name: "A2S OTT - Stream Movies",
         short_name: "A2S OTT",
