@@ -13,7 +13,7 @@ export function AppDownloadBadges({
   size = 'md',
   className = '' 
 }: AppDownloadBadgesProps) {
-  const { isInstallable, isInstalled, install } = usePwaInstall();
+  const { isInstallable, isInstalled, isIosDevice, install } = usePwaInstall();
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -37,16 +37,20 @@ export function AppDownloadBadges({
   }
 
   const handleDownload = async () => {
-    if (isInstallable) {
-      await install();
-      return;
-    }
+    try {
+      if (isInstallable) {
+        await install();
+        return;
+      }
 
-    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isiOS) {
-      window.alert('To install this app on iPhone: tap Share (□↑) → Add to Home Screen.');
-    } else {
-      window.alert('Install is not available in this browser view. Open this same site in Chrome mobile and tap Install app / Add to Home screen from the browser menu.');
+      if (isIosDevice) {
+        window.alert('On iPhone: tap Share (□↑) → Add to Home Screen.');
+      } else {
+        window.alert('On Android Chrome: open browser menu (⋮) → Install app / Add to Home screen.');
+      }
+    } catch (error) {
+      console.error('Install flow failed:', error);
+      window.alert('Install failed. Please try again.');
     }
   };
 
