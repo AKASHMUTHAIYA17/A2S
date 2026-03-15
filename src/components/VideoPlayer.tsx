@@ -54,7 +54,7 @@ export const VideoPlayer = ({ videoUrl, poster, title, onClose, isFullScreen = f
   const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hideControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Auto-play on mount
   useEffect(() => {

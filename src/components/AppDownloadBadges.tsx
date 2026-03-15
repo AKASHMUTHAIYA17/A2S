@@ -8,12 +8,12 @@ interface AppDownloadBadgesProps {
   className?: string;
 }
 
-export function AppDownloadBadges({ 
-  variant = 'horizontal', 
+export function AppDownloadBadges({
+  variant = 'horizontal',
   size = 'md',
-  className = '' 
+  className = ''
 }: AppDownloadBadgesProps) {
-  const { isInstallable, isInstalled, isIosDevice, install } = usePwaInstall();
+  const { isInstallable, isInstalled, isIosDevice, isMobileDevice, install } = usePwaInstall();
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -38,6 +38,11 @@ export function AppDownloadBadges({
 
   const handleDownload = async () => {
     try {
+      if (!isMobileDevice) {
+        window.alert('Please open this website on your Android phone or iPhone to install the app directly on mobile.');
+        return;
+      }
+
       if (isInstallable) {
         await install();
         return;
@@ -62,7 +67,7 @@ export function AppDownloadBadges({
         variant="default"
       >
         <Download className={iconSizes[size]} />
-        Download A2S OTT App
+        Install A2S OTT App
       </Button>
     </div>
   );
