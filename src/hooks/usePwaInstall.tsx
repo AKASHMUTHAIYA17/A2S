@@ -21,7 +21,6 @@ export function usePwaInstall() {
     setIsInstalled(isStandaloneMode());
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      if (!isMobileDevice()) return;
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
