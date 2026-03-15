@@ -21,7 +21,6 @@ export function usePwaInstall() {
     setIsInstalled(isStandaloneMode());
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      if (!isMobileDevice()) return;
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
@@ -43,7 +42,7 @@ export function usePwaInstall() {
   }, []);
 
   const install = async () => {
-    if (!deferredPrompt || !isMobileDevice()) return false;
+    if (!deferredPrompt) return false;
 
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;

@@ -38,20 +38,17 @@ export function AppDownloadBadges({
 
   const handleDownload = async () => {
     try {
-      if (!isMobileDevice) {
-        window.alert('Please open this website on your Android phone or iPhone to install the app directly on mobile.');
-        return;
-      }
-
       if (isInstallable) {
         await install();
         return;
       }
 
       if (isIosDevice) {
-        window.alert('On iPhone: tap Share (□↑) → Add to Home Screen.');
+        window.alert('To install:\n1. Tap the Share button (□↑) at the bottom\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to install the app');
+      } else if (isMobileDevice) {
+        window.alert('To install:\n1. Tap the browser menu (⋮) at the top right\n2. Tap "Install app" or "Add to Home screen"\n3. The app will be added to your home screen');
       } else {
-        window.alert('On Android Chrome: open browser menu (⋮) → Install app / Add to Home screen.');
+        window.alert('To install:\nClick the install icon (⊕) in your browser address bar, or open this site on your phone to install the mobile app.');
       }
     } catch (error) {
       console.error('Install flow failed:', error);
