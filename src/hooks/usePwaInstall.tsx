@@ -42,7 +42,7 @@ export function usePwaInstall() {
   }, []);
 
   const install = async () => {
-    if (!deferredPrompt || !isMobileDevice()) return false;
+    if (!deferredPrompt) return false;
 
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
