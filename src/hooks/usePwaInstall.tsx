@@ -6,6 +6,8 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const isIosDevice = () => /iPad|iPhone|iPod/.test(navigator.userAgent);
+const isAndroidDevice = () => /Android/i.test(navigator.userAgent);
+const isMobileDevice = () => isIosDevice() || isAndroidDevice();
 const isStandaloneMode = () =>
   window.matchMedia('(display-mode: standalone)').matches ||
   Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone);
@@ -19,6 +21,7 @@ export function usePwaInstall() {
     setIsInstalled(isStandaloneMode());
 
     const handleBeforeInstallPrompt = (e: Event) => {
+      if (!isMobileDevice()) return;
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
@@ -40,7 +43,7 @@ export function usePwaInstall() {
   }, []);
 
   const install = async () => {
-    if (!deferredPrompt) return false;
+    if (!deferredPrompt || !isMobileDevice()) return false;
 
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -54,5 +57,11 @@ export function usePwaInstall() {
     return outcome === 'accepted';
   };
 
-  return { isInstallable, isInstalled, isIosDevice: isIosDevice(), install };
+  return {
+    isInstallable,
+    isInstalled,
+    isIosDevice: isIosDevice(),
+    isMobileDevice: isMobileDevice(),
+    install,
+  };
 }
