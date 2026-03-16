@@ -5,9 +5,13 @@ import { MovieGrid } from '@/components/MovieGrid';
 import { CategoryFilter } from '@/components/CategoryFilter';
 import { Footer } from '@/components/Footer';
 import { AppDownloadSection } from '@/components/AppDownloadSection';
+import { ContinueWatchingRow } from '@/components/ContinueWatchingRow';
+import { BottomNavBar } from '@/components/BottomNavBar';
+import { InstallBanner } from '@/components/InstallBanner';
 import { useInfiniteMovies } from '@/hooks/useInfiniteMovies';
 import { useRealtimeMovies } from '@/hooks/useMovies';
 import { MovieListJsonLd, WebsiteJsonLd, OrganizationJsonLd } from '@/components/MovieJsonLd';
+
 const Index = () => {
   useRealtimeMovies();
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -24,7 +28,7 @@ const Index = () => {
   }, [data]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       {/* JSON-LD Structured Data for SEO */}
       <WebsiteJsonLd />
       <OrganizationJsonLd />
@@ -34,6 +38,9 @@ const Index = () => {
       
       {/* Hero Section */}
       <HeroBanner />
+      
+      {/* Continue Watching */}
+      <ContinueWatchingRow />
       
       {/* Category Filter */}
       <CategoryFilter 
@@ -55,6 +62,12 @@ const Index = () => {
       <AppDownloadSection />
       
       <Footer />
+      
+      {/* Mobile Bottom Nav */}
+      <BottomNavBar />
+      
+      {/* Install Banner */}
+      <InstallBanner />
     </div>
   );
 };
