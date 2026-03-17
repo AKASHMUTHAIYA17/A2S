@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Download, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
+import { InstallInstructions } from './InstallInstructions';
 
 interface AppDownloadBadgesProps {
   variant?: 'horizontal' | 'vertical';
@@ -13,7 +15,8 @@ export function AppDownloadBadges({
   size = 'md',
   className = ''
 }: AppDownloadBadgesProps) {
-  const { isInstallable, isInstalled, isIosDevice, isMobileDevice, install } = usePwaInstall();
+  const { isInstallable, isInstalled, isIosDevice, isAndroidDevice, isMobileDevice, install } = usePwaInstall();
+  const [showInstructions, setShowInstructions] = useState<'ios' | 'android' | 'desktop' | null>(null);
 
   const sizeClasses = {
     sm: 'h-9 text-xs px-3',
@@ -38,34 +41,49 @@ export function AppDownloadBadges({
 
   const handleDownload = async () => {
     try {
+      // Try native install prompt first
       if (isInstallable) {
-        await install();
-        return;
+        const accepted = await install();
+        if (accepted) return;
       }
 
+      // Show visual instructions as fallback
       if (isIosDevice) {
-        window.alert('To install:\n1. Tap the Share button (□↑) at the bottom\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to install the app');
-      } else if (isMobileDevice) {
-        window.alert('To install:\n1. Tap the browser menu (⋮) at the top right\n2. Tap "Install app" or "Add to Home screen"\n3. The app will be added to your home screen');
+        setShowInstructions('ios');
+      } else if (isAndroidDevice) {
+        setShowInstructions('android');
       } else {
-        window.alert('To install:\nClick the install icon (⊕) in your browser address bar, or open this site on your phone to install the mobile app.');
+        setShowInstructions('desktop');
       }
     } catch (error) {
       console.error('Install flow failed:', error);
-      window.alert('Install failed. Please try again.');
+      if (isMobileDevice) {
+        setShowInstructions(isIosDevice ? 'ios' : 'android');
+      } else {
+        setShowInstructions('desktop');
+      }
     }
   };
 
   return (
-    <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
-      <Button
-        onClick={handleDownload}
-        className={`${sizeClasses[size]} gap-2`}
-        variant="default"
-      >
-        <Download className={iconSizes[size]} />
-        Install A2S OTT App
-      </Button>
-    </div>
+    <>
+      <div className={`flex ${variant === 'vertical' ? 'flex-col' : 'flex-row'} gap-3 ${className}`}>
+        <Button
+          onClick={handleDownload}
+          className={`${sizeClasses[size]} gap-2`}
+          variant="default"
+        >
+          <Download className={iconSizes[size]} />
+          Install A2S OTT App
+        </Button>
+      </div>
+
+      {showInstructions && (
+        <InstallInstructions
+          platform={showInstructions}
+          onClose={() => setShowInstructions(null)}
+        />
+      )}
+    </>
   );
 }
