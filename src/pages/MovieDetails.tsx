@@ -9,6 +9,7 @@ import { MovieRow } from '@/components/MovieRow';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { MovieJsonLd } from '@/components/MovieJsonLd';
 import { AuthModal } from '@/components/AuthModal';
+import { MovieComments } from '@/components/MovieComments';
 import { useMovies } from '@/hooks/useMovies';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAuth } from '@/hooks/useAuth';
@@ -212,6 +213,9 @@ const MovieDetails = () => {
           isFullScreen
         />
       )}
+      {/* Comments & Reviews */}
+      <MovieComments movieId={movie.id} onAuthRequired={handleAuthRequired} />
+
       {/* Similar Movies */}
       {similarMovies.length > 0 && (
         <MovieRow title="Similar Movies" movies={similarMovies} className="pt-12" />
