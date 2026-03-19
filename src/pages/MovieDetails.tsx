@@ -213,6 +213,9 @@ const MovieDetails = () => {
           isFullScreen
         />
       )}
+      {/* Comments & Reviews */}
+      <MovieComments movieId={movie.id} onAuthRequired={handleAuthRequired} />
+
       {/* Similar Movies */}
       {similarMovies.length > 0 && (
         <MovieRow title="Similar Movies" movies={similarMovies} className="pt-12" />
