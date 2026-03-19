@@ -23,7 +23,6 @@ function toEmbedUrl(url: string): string | null {
     }
     if (host === 'youtube.com' || host === 'm.youtube.com') {
       const id = u.searchParams.get('v') || u.pathname.split('/').filter(Boolean).pop();
-      // Accept /watch?v=, /embed/, /shorts/
       if (!id) return null;
       return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
     }
@@ -33,6 +32,27 @@ function toEmbedUrl(url: string): string | null {
       const parts = u.pathname.split('/').filter(Boolean);
       const id = parts.find(p => /^\d+$/.test(p));
       return id ? `https://player.vimeo.com/video/${id}?autoplay=1` : null;
+    }
+
+    // Cloudinary Player embed URL
+    if (host === 'player.cloudinary.com' && u.pathname.includes('/embed')) {
+      // Already an embed URL, pass through with autoplay
+      const params = new URLSearchParams(u.search);
+      params.set('autoplay', 'true');
+      params.set('controls', 'true');
+      return `${u.origin}${u.pathname}?${params.toString()}`;
+    }
+
+    // Cloudinary direct video URL (res.cloudinary.com) — convert to embed
+    if (host === 'res.cloudinary.com') {
+      const pathParts = u.pathname.split('/');
+      const cloudName = pathParts[1];
+      // Find public_id: everything after /upload/ (or /video/upload/) minus extension
+      const uploadIdx = pathParts.indexOf('upload');
+      if (uploadIdx !== -1 && cloudName) {
+        const publicId = pathParts.slice(uploadIdx + 1).join('/').replace(/\.[^/.]+$/, '');
+        return `https://player.cloudinary.com/embed/?cloud_name=${cloudName}&public_id=${publicId}&autoplay=true&controls=true`;
+      }
     }
 
     return null;
