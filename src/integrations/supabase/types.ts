@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      movie_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          movie_id: string
+          rating: number | null
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          movie_id: string
+          rating?: number | null
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          movie_id?: string
+          rating?: number | null
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movie_comments_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       movies: {
         Row: {
           category: string
