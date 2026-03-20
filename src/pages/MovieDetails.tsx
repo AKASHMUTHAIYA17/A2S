@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2, Check, Heart } from 'lucide-react';
+import { Play, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2, Heart } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
