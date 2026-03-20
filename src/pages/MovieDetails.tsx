@@ -172,15 +172,17 @@ const MovieDetails = () => {
                   <Play className="w-5 h-5 fill-current" />
                   Watch Now
                 </Button>
-                <Button 
-                  variant="glass" 
-                  size="lg" 
-                  className="gap-2"
-                  onClick={() => user ? toggleMyList(movie.id) : handleAuthRequired()}
-                >
-                  {isInList(movie.id) ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                  {isInList(movie.id) ? 'In List' : 'My List'}
-                </Button>
+                {movie.trailerUrl && (
+                  <Button 
+                    variant="glass" 
+                    size="lg" 
+                    className="gap-2"
+                    onClick={() => setIsPlayingTrailer(true)}
+                  >
+                    <Play className="w-5 h-5" />
+                    Trailer
+                  </Button>
+                )}
                 <Button 
                   variant="glass" 
                   size="icon" 
