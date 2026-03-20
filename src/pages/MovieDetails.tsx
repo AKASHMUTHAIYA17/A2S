@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Plus, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2, Check, Heart } from 'lucide-react';
+import { Play, ThumbsUp, Share2, ArrowLeft, Star, Clock, Calendar, Loader2, Heart } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
@@ -18,6 +18,7 @@ import { toast } from '@/hooks/use-toast';
 const MovieDetails = () => {
   const { id } = useParams();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { data: movies = [], isLoading } = useMovies();
   const { user } = useAuth();
@@ -172,15 +173,17 @@ const MovieDetails = () => {
                   <Play className="w-5 h-5 fill-current" />
                   Watch Now
                 </Button>
-                <Button 
-                  variant="glass" 
-                  size="lg" 
-                  className="gap-2"
-                  onClick={() => user ? toggleMyList(movie.id) : handleAuthRequired()}
-                >
-                  {isInList(movie.id) ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                  {isInList(movie.id) ? 'In List' : 'My List'}
-                </Button>
+                {movie.trailerUrl && (
+                  <Button 
+                    variant="glass" 
+                    size="lg" 
+                    className="gap-2"
+                    onClick={() => setIsPlayingTrailer(true)}
+                  >
+                    <Play className="w-5 h-5" />
+                    Trailer
+                  </Button>
+                )}
                 <Button 
                   variant="glass" 
                   size="icon" 
@@ -210,6 +213,16 @@ const MovieDetails = () => {
           poster={movie.poster}
           title={movie.title}
           onClose={() => setIsPlaying(false)}
+          isFullScreen
+        />
+      )}
+      {/* Trailer Player */}
+      {isPlayingTrailer && movie.trailerUrl && (
+        <VideoPlayer
+          videoUrl={movie.trailerUrl}
+          poster={movie.poster}
+          title={`${movie.title} - Trailer`}
+          onClose={() => setIsPlayingTrailer(false)}
           isFullScreen
         />
       )}
