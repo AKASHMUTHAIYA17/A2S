@@ -216,6 +216,16 @@ const MovieDetails = () => {
           isFullScreen
         />
       )}
+      {/* Trailer Player */}
+      {isPlayingTrailer && movie.trailerUrl && (
+        <VideoPlayer
+          videoUrl={movie.trailerUrl}
+          poster={movie.poster}
+          title={`${movie.title} - Trailer`}
+          onClose={() => setIsPlayingTrailer(false)}
+          isFullScreen
+        />
+      )}
       {/* Comments & Reviews */}
       <MovieComments movieId={movie.id} onAuthRequired={handleAuthRequired} />
 
