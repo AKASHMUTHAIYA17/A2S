@@ -18,6 +18,7 @@ import { toast } from '@/hooks/use-toast';
 const MovieDetails = () => {
   const { id } = useParams();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingTrailer, setIsPlayingTrailer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { data: movies = [], isLoading } = useMovies();
   const { user } = useAuth();
